@@ -1,0 +1,35 @@
+EXPORTS
+    cuInit
+    cuMemAlloc
+    cuMemFree
+    cuMemcpyHtoD
+    cuMemcpyDtoH
+    cuMemcpyDtoD
+    cuLaunchKernel
+    cuCtxCreate
+    cuCtxDestroy
+    cuModuleLoad
+    cuModuleGetFunction
+    cuDeviceGetCount
+    cuDeviceGet
+    cuDeviceGetName
+    cuDeviceTotalMem
+    
+    ; 流管理API
+    cuStreamCreate
+    cuStreamDestroy
+    cuStreamSynchronize
+    cuStreamWaitEvent
+    
+    ; 事件管理API
+    cuEventCreate
+    cuEventRecord
+    cuEventSynchronize
+    cuEventDestroy
+    cuEventElapsedTime
+    
+    ; 多设备API
+    cuDevicePrimaryCtxRetain
+    cuDevicePrimaryCtxRelease
+    cuCtxEnablePeerAccess
+    cuCtxDisablePeerAccess

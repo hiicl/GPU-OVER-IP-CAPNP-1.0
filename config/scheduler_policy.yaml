@@ -1,0 +1,12 @@
+policies:
+  high_throughput:
+    topology_weight: 0.4
+    bandwidth_weight: 0.3
+    load_weight: 0.2
+    affinity_weight: 0.1
+    
+  low_latency:
+    topology_weight: 0.5
+    bandwidth_weight: 0.3
+    load_weight: 0.1  
+    affinity_weight: 0.1
