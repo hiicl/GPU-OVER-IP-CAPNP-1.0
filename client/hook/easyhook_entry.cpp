@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <easyhook.h>
+#include <iostream> // 添加iostream头文件
 #include "hook_cuda.h"
 #include "launcher_client.h"
 
@@ -11,10 +12,16 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH:
             // 初始化LauncherClient并连接到本地服务
-g_launcher_client = std::make_unique<LauncherClient>("127.0.0.1:12345");
-            if (!g_launcher_client->Connect()) {
-                MessageBoxA(NULL, "Failed to connect to Launcher service", "Error", MB_ICONERROR);
-            }
+    g_launcher_client = std::make_unique<LauncherClient>("127.0.0.1:12345");
+    if (g_launcher_client) {
+        if (g_launcher_client->connect()) {
+            std::cout << "Successfully connected to launcher" << std::endl;
+        } else {
+            std::cerr << "Failed to connect to launcher" << std::endl;
+        }
+    } else {
+        std::cerr << "Failed to create launcher client" << std::endl;
+    }
             break;
         case DLL_PROCESS_DETACH:
             // 清理资源

@@ -66,7 +66,7 @@ struct MemcpyPlan {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(ddb256ee5b6b53b3, 2, 1)
+    CAPNP_DECLARE_STRUCT_HEADER(ddb256ee5b6b53b3, 1, 1)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -400,9 +400,7 @@ public:
   inline bool hasTargetServerIp() const;
   inline  ::capnp::Text::Reader getTargetServerIp() const;
 
-  inline  ::uint32_t getTargetServerRdmaPort() const;
-
-  inline  ::uint64_t getRemotePtr() const;
+  inline  ::uint16_t getTargetServerZmqPort() const;
 
   inline  ::ErrorCode getError() const;
 
@@ -441,11 +439,8 @@ public:
   inline void adoptTargetServerIp(::capnp::Orphan< ::capnp::Text>&& value);
   inline ::capnp::Orphan< ::capnp::Text> disownTargetServerIp();
 
-  inline  ::uint32_t getTargetServerRdmaPort();
-  inline void setTargetServerRdmaPort( ::uint32_t value);
-
-  inline  ::uint64_t getRemotePtr();
-  inline void setRemotePtr( ::uint64_t value);
+  inline  ::uint16_t getTargetServerZmqPort();
+  inline void setTargetServerZmqPort( ::uint16_t value);
 
   inline  ::ErrorCode getError();
   inline void setError( ::ErrorCode value);
@@ -1689,46 +1684,32 @@ inline ::capnp::Orphan< ::capnp::Text> MemcpyPlan::Builder::disownTargetServerIp
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
-inline  ::uint32_t MemcpyPlan::Reader::getTargetServerRdmaPort() const {
-  return _reader.getDataField< ::uint32_t>(
+inline  ::uint16_t MemcpyPlan::Reader::getTargetServerZmqPort() const {
+  return _reader.getDataField< ::uint16_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
 
-inline  ::uint32_t MemcpyPlan::Builder::getTargetServerRdmaPort() {
-  return _builder.getDataField< ::uint32_t>(
+inline  ::uint16_t MemcpyPlan::Builder::getTargetServerZmqPort() {
+  return _builder.getDataField< ::uint16_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
-inline void MemcpyPlan::Builder::setTargetServerRdmaPort( ::uint32_t value) {
-  _builder.setDataField< ::uint32_t>(
+inline void MemcpyPlan::Builder::setTargetServerZmqPort( ::uint16_t value) {
+  _builder.setDataField< ::uint16_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::uint64_t MemcpyPlan::Reader::getRemotePtr() const {
-  return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-
-inline  ::uint64_t MemcpyPlan::Builder::getRemotePtr() {
-  return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline void MemcpyPlan::Builder::setRemotePtr( ::uint64_t value) {
-  _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
 }
 
 inline  ::ErrorCode MemcpyPlan::Reader::getError() const {
   return _reader.getDataField< ::ErrorCode>(
-      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
 }
 
 inline  ::ErrorCode MemcpyPlan::Builder::getError() {
   return _builder.getDataField< ::ErrorCode>(
-      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
 }
 inline void MemcpyPlan::Builder::setError( ::ErrorCode value) {
   _builder.setDataField< ::ErrorCode>(
-      ::capnp::bounded<2>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool NodeStatus::Reader::hasId() const {
