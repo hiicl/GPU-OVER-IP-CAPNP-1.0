@@ -7,6 +7,11 @@
 LauncherClient::LauncherClient(const std::string& address) 
     : m_address(address) {}
 
+bool LauncherClient::Connect(const std::string& address) {
+    m_address = address; // 更新地址
+    return connect(); // 调用现有的连接逻辑
+}
+
 bool LauncherClient::connect() {
     try {
         m_rpcClient = std::make_unique<capnp::EzRpcClient>(m_address);

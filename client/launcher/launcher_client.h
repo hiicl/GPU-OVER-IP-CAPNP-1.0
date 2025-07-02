@@ -1,15 +1,16 @@
 #pragma once
 
-#include "common.capnp.h"  // 更新包含路径
-#include "hook-launcher.capnp.h"  // 更新包含路径
+#include "hook-launcher.capnp.h"
+#include "common.capnp.h"
 #include <capnp/ez-rpc.h>
 #include <memory>
-#include <string>  // 添加缺失的头文件
-#include <cstdint>  // 添加缺失的头文件
+#include <string>  
+#include <cstdint>  
 
 class LauncherClient {
 public:
     LauncherClient(const std::string& address);
+    bool Connect(const std::string& address); // 修正为单参数Connect方法
     bool connect();
     
     // HookLauncher接口实现
