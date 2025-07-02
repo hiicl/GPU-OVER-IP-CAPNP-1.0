@@ -2,12 +2,17 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"net"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 
 	"capnproto.org/go/capnp/v3"
 	"capnproto.org/go/capnp/v3/rpc"
+	"github.com/pebbe/zmq4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
@@ -36,6 +41,43 @@ func NewCapnpServer() *CapnpServer {
 		roceMgr:   roce.NewRoCEManager(),
 		scheduler: scheduler,
 		log:       log,
+	}
+}
+
+// 启动ZMQ数据接收器
+func (s *CapnpServer) StartZMQReceiver(port string) {
+	context, err := zmq4.NewContext()
+	if err != nil {
+		s.log.Errorf("Failed to create ZMQ context: %v", err)
+		return
+	}
+	defer context.Term()
+
+	socket, err := context.NewSocket(zmq4.DGRAM)
+	if err != nil {
+		s.log.Errorf("Failed to create ZMQ socket: %v", err)
+		return
+	}
+	defer socket.Close()
+
+	endpoint := fmt.Sprintf("udp://*:%s", port)
+	if err := socket.Bind(endpoint); err != nil {
+		s.log.Errorf("Failed to bind to %s: %v", endpoint, err)
+		return
+	}
+	s.log.Infof("ZMQ data receiver started on port %s", port)
+
+	// 主接收循环
+	for {
+		msg, err := socket.RecvBytes(0)
+		if err != nil {
+			s.log.Errorf("Error receiving message: %v", err)
+			continue
+		}
+
+		// 这里添加CUDA内存拷贝逻辑
+		// 伪代码: cudaMemcpy(dstDevice, msg, size, cudaMemcpyHostToDevice)
+		s.log.Debugf("Received %d bytes of data via ZMQ", len(msg))
 	}
 }
 
@@ -217,9 +259,11 @@ func (s *CapnpServer) CUDAMemAlloc(ctx context.Context, call gpu.GPUService_cuda
 	return nil
 }
 
-// 其他CUDA方法实现...
-
 func main() {
+	// 解析命令行参数
+	dataPort := flag.String("dataPort", "5555", "ZMQ data port")
+	flag.Parse()
+
 	// 初始化配置
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
@@ -245,6 +289,9 @@ func main() {
 	// 创建Cap'n Proto服务器
 	server := NewCapnpServer()
 	
+	// 启动ZMQ数据接收器
+	go server.StartZMQReceiver(*dataPort)
+	
 	// 启动Cap'n Proto RPC服务器
 	addr := viper.GetString("server.address")
 	listener, err := net.Listen("tcp", addr)
@@ -254,8 +301,6 @@ func main() {
 	defer listener.Close()
 	
 	server.log.Infof("Cap'n Proto server listening on %s", addr)
-
-	server.log.Infof("Cap'n Proto server listening on %s", listener.Addr())
 
 	// 主循环
 	var wg sync.WaitGroup
