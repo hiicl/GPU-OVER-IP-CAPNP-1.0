@@ -26,7 +26,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=ppc64le go build -o aitherion-server ./cmd/g
 FROM debian:bullseye-slim
 
 # 设置工作目录
-WORKDIR /aitherion
+WORKDIR /aitherion-cli
 
 # 从构建阶段复制构建好的Go服务二进制文件
 COPY --from=builder /app/aitherion-server .

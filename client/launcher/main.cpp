@@ -107,7 +107,7 @@ public:
         // 生成传输计划
         auto plan = context.getResults().initPlan();
         plan.setTargetServerIp(node->address);
-        plan.setTargetServerRdmaPort(50051); // 默认RDMA端口
+        plan.setTargetServerZmqPort(node->zmq_port); // 使用节点配置的ZMQ端口
         plan.setRemotePtr(allocInfo->remote_handle);
         plan.setError(CUDA_SUCCESS);
         

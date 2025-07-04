@@ -32,6 +32,7 @@ struct RemoteNode {
     double network_latency;
     double cpu_usage;
     double gpu_utilization;
+    uint16_t zmq_port;  // ZMQ数据传输端口
     std::unique_ptr<LauncherClient> launcher_client;  // 更新为新的客户端类型
 };
 

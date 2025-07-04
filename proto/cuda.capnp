@@ -1,24 +1,18 @@
 @0xbbbbcccc22224444;
 
 using Common = import "common.capnp";
-using Control = import "gpu-control.capnp";
+using Kernel = import "kernel.capnp";
 
 struct CudaMemInfo {
-    addr @0 :Common.Handle;
+    handle @0 :Common.MemoryHandle;
     size @1 :UInt64;
 }
 
 struct MemcpyParams {
-    src @0 :Common.Handle;
-    dst @1 :Common.Handle;
+    src @0 :Common.MemoryHandle;
+    dst @1 :Common.MemoryHandle;
     size @2 :UInt64;
-    direction @3 :Direction;
-}
-
-enum Direction {
-    hostToDevice @0;
-    deviceToHost @1;
-    deviceToDevice @2;
+    direction @3 :Common.TransferDirection;
 }
 
 struct StreamHandle {
@@ -37,13 +31,9 @@ struct EventParams {
     flags @0 :UInt32;
 }
 
-struct BatchRunRequest {
-    requests @0 :List(Control.RunRequest);
+struct BatchKernelLaunch {
+    requests @0 :List(Kernel.KernelLaunch);
     stream @1 :Common.Handle;
-}
-
-struct BatchRunResponse {
-    responses @0 :List(Control.RunResponse);
 }
 
 struct MultiGpuRequest {
@@ -53,22 +43,22 @@ struct MultiGpuRequest {
 }
 
 interface CudaService {
-    cudaInit @0 () -> (ack :Control.Ack);
-    cudaMemAlloc @1 (info :CudaMemInfo) -> (result :CudaMemInfo);
-    cudaMemcpy @2 (params :MemcpyParams) -> (ack :Control.Ack);
-    cudaMemFree @3 (info :CudaMemInfo) -> (ack :Control.Ack);
+    cudaInit @0 () -> (ack :Common.Ack);
+    cudaMemAlloc @1 (size :UInt64) -> (result :CudaMemInfo);
+    cudaMemcpy @2 (params :MemcpyParams) -> (ack :Common.Ack);
+    cudaMemFree @3 (handle :Common.MemoryHandle) -> (ack :Common.Ack);
 
     createCudaStream @4 (params :StreamCreateParams) -> (handle :StreamHandle);
-    destroyCudaStream @5 (handle :StreamHandle) -> (ack :Control.Ack);
-    synchronizeCudaStream @6 (handle :StreamHandle) -> (ack :Control.Ack);
+    destroyCudaStream @5 (handle :StreamHandle) -> (ack :Common.Ack);
+    synchronizeCudaStream @6 (handle :StreamHandle) -> (ack :Common.Ack);
 
-    cudaKernelLaunch @7 (request :Control.RunRequest) -> (response :Control.RunResponse);
+    cudaKernelLaunch @7 (request :Kernel.KernelLaunch) -> (ack :Common.Ack);
 
     createEvent @8 (params :EventParams) -> (handle :EventHandle);
-    recordEvent @9 (handle :EventHandle) -> (ack :Control.Ack);
-    eventSynchronize @10 (handle :EventHandle) -> (ack :Control.Ack);
-    destroyEvent @11 (handle :EventHandle) -> (ack :Control.Ack);
+    recordEvent @9 (handle :EventHandle) -> (ack :Common.Ack);
+    eventSynchronize @10 (handle :EventHandle) -> (ack :Common.Ack);
+    destroyEvent @11 (handle :EventHandle) -> (ack :Common.Ack);
 
-    batchKernelLaunch @12 (request :BatchRunRequest) -> (response :BatchRunResponse);
-    multiGpuCooperation @13 (request :MultiGpuRequest) -> (ack :Control.Ack);
+    batchKernelLaunch @12 (request :BatchKernelLaunch) -> (ack :Common.Ack);
+    multiGpuCooperation @13 (request :MultiGpuRequest) -> (ack :Common.Ack);
 }
