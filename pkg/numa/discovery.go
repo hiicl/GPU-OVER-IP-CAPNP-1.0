@@ -9,19 +9,14 @@ import (
 
 // Node 表示NUMA节点信息
 type Node struct {
-	ID      int      // 节点ID
-	CPUs    []int    // 节点关联的CPU核心
-	Memory  uint64   // 节点内存大小（字节）
-	Devices []string // 节点关联的设备ID
+	ID         int             // 节点ID
+	CPUs       []int           // 节点关联的CPU核心
+	Memory     uint64          // 节点内存大小（字节）
+	Devices    []string        // 节点关联的设备ID
+	OpenCapi   []OpenCapiDevice // OpenCAPI设备
 }
 
 // DiscoverNodes 发现系统中的NUMA节点
-// IsSameNode 检查两个设备是否在同一NUMA节点
-func IsSameNode(deviceA, deviceB string) bool {
-	// 实际实现中从设备ID提取NUMA节点信息
-	return deviceA[:3] == deviceB[:3]
-}
-
 func DiscoverNodes() ([]Node, error) {
 	nodes := []Node{}
 	
@@ -30,6 +25,9 @@ func DiscoverNodes() ([]Node, error) {
 	if err != nil {
 		return nil, err
 	}
+	
+	// 发现OpenCAPI设备
+	ocDevices, _ := DiscoverOpenCapiDevices()
 	
 	for _, f := range files {
 		if !f.IsDir() || !strings.HasPrefix(f.Name(), "node") {
@@ -67,7 +65,21 @@ func DiscoverNodes() ([]Node, error) {
 			memFile.Close()
 		}
 		
+		// 关联OpenCAPI设备
+		for _, dev := range ocDevices {
+			if dev.NodeID == nodeID {
+				node.OpenCapi = append(node.OpenCapi, dev)
+				node.Devices = append(node.Devices, dev.Device)
+			}
+		}
+		
 		nodes = append(nodes, node)
 	}
 	return nodes, nil
+}
+
+// IsSameNode 检查两个设备是否在同一NUMA节点
+func IsSameNode(deviceA, deviceB string) bool {
+	// 实际实现中从设备ID提取NUMA节点信息
+	return deviceA[:3] == deviceB[:3]
 }

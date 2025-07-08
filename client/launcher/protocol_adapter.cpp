@@ -1,5 +1,5 @@
 #include "protocol_adapter.h"
-#include "proto/cuda.capnp.h"
+#include "cuda.capnp.h"
 
 MemoryHandle ProtocolAdapter::convertToMemoryHandle(const RemoteAllocInfo& info) {
     MemoryHandle handle;

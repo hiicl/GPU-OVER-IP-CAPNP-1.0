@@ -2,8 +2,8 @@
 #include "launcher_client.h"
 #include "zmq_manager.h"
 #include "context_manager.h" // 添加内存映射管理
-#include "proto/hook-launcher.capnp.h"
-#include "proto/cuda.capnp.h"
+#include "hook-launcher.capnp.h"
+#include "cuda.capnp.h"
 #include <iostream>
 #include <mutex>
 #include <vector>

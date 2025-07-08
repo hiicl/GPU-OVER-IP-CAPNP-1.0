@@ -24,7 +24,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/hiicl/GPU-over-IP-AC922/pkg/numa"         // NUMA支持
-	"github.com/hiicl/GPU-over-IP-AC922/proto"            // 协议定义
+	"ggithub.com/hiicl/GPU-over-IP-AC922/proto/proto"            // 协议定义
 )
 
 // CapnpServer 实现Cap'n Proto GPU服务
@@ -36,6 +36,8 @@ type CapnpServer struct {
     modCache  map[string]cuda.Module  // 模块缓存
     funcMeta  map[uint64]string       // 函数元数据缓存（句柄->函数名）
     paramPool *sync.Pool             // 参数缓冲区池
+    msgPool   *sync.Pool             // ZMQ消息缓冲池
+    cacheLock sync.RWMutex          // 缓存访问锁
 }
 
 // 实现GPUService接口
@@ -127,6 +129,14 @@ func NewCapnpServer() *CapnpServer {
 	}
 	log.Infof("Discovered %d NUMA nodes", len(nodes))
 	
+	// 记录OpenCAPI设备信息（不修改绑定）
+	for _, node := range nodes {
+		for _, dev := range node.OpenCapi {
+			log.Infof("Found OpenCAPI device: %s (AFU: %s) on node %d, memory: %d MB", 
+				dev.Name, dev.AFUName, dev.NodeID, dev.Memory/(1024*1024))
+		}
+	}
+	
 	// NUMA绑定由容器运行时处理
 	// 注意: 资源管理器节点隔离已通过容器级NUMA绑定实现
 	
@@ -148,6 +158,13 @@ func NewCapnpServer() *CapnpServer {
 		},
 	}
 	
+	// 初始化消息缓冲池
+	msgPool := &sync.Pool{
+		New: func() interface{} {
+			return make([]byte, 0, 4096) // 初始容量4KB
+		},
+	}
+	
 	return &CapnpServer{
 		gpuStore:  gpuStore,
 		scheduler: scheduler,
@@ -156,6 +173,7 @@ func NewCapnpServer() *CapnpServer {
 		modCache:  make(map[string]cuda.Module),
 		funcMeta:  make(map[uint64]string),
 		paramPool: paramPool,
+		msgPool:   msgPool,
 	}
 }
 
@@ -180,41 +198,91 @@ func (s *CapnpServer) StartZMQReceiver(port string) {
 		return
 	}
 	s.log.Infof("ZMQ data receiver started on port %s", port)
+	
+	// 优化接收设置
 	if err := socket.SetRcvhwm(1000); err != nil {
 		s.log.Errorf("Failed to set receive HWM: %v", err)
 	}
+	if err := socket.SetLinger(0); err != nil {
+		s.log.Warnf("Failed to set linger: %v", err)
+	}
 
-	workQueue := make(chan []byte, 1024)
-	defer close(workQueue)
+	// 环形缓冲区实现
+	const ringSize = 1024
+	ringBuffer := make([][]byte, ringSize)
+	head := 0
+	tail := 0
+	ringMutex := &sync.Mutex{}
+	ringCond := sync.NewCond(ringMutex)
 
+	// 工作线程
 	var wg sync.WaitGroup
 	for i := 0; i < 4; i++ {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
-			for msg := range workQueue {
+			for {
+				ringMutex.Lock()
+				for head == tail {
+					ringCond.Wait()
+				}
+				msg := ringBuffer[tail]
+				tail = (tail + 1) % ringSize
+				ringMutex.Unlock()
+				
+				// 处理消息
 				s.processMessage(msg, id)
+				
+				// 消息处理完成后放回缓冲池
+				msg = msg[:0] // 重置切片长度
+				s.msgPool.Put(msg)
 			}
 		}(i)
 	}
 
+	// 接收循环
 	for {
-		msg, err := socket.RecvBytes(0)
+		// 从缓冲池获取缓冲区
+		buf := s.msgPool.Get().([]byte)
+		if cap(buf) < 4096 {
+			buf = make([]byte, 0, 4096)
+		}
+		buf = buf[:cap(buf)] // 扩展到最大容量
+		
+		// 接收数据
+		n, err := socket.RecvBytes(0)
 		if err != nil {
 			s.log.Errorf("Error receiving message: %v", err)
+			s.msgPool.Put(buf)
 			continue
 		}
-		select {
-		case workQueue <- msg:
-		default:
-			s.log.Warn("Work queue full, dropping message")
+		
+		// 复制数据到缓冲池中的缓冲区
+		if len(n) > cap(buf) {
+			s.log.Warnf("Message too large (%d > %d), dropping", len(n), cap(buf))
+			s.msgPool.Put(buf)
+			continue
 		}
+		buf = append(buf[:0], n...)
+		
+		ringMutex.Lock()
+		next := (head + 1) % ringSize
+		if next == tail {
+			s.log.Warn("Ring buffer full, dropping message")
+			ringMutex.Unlock()
+			s.msgPool.Put(buf)
+			continue
+		}
+		
+		ringBuffer[head] = buf
+		head = next
+		ringMutex.Unlock()
+		ringCond.Signal()
 	}
 }
 
 func (s *CapnpServer) processMessage(msg []byte, workerID int) {
 	const headerSize = 32
-	const maxRetries = 3
 
 	if len(msg) < headerSize {
 		s.log.Errorf("[worker-%d] Message too short (%d bytes)", workerID, len(msg))
@@ -240,22 +308,20 @@ func (s *CapnpServer) processMessage(msg []byte, workerID int) {
 	}
 
 	payload := msg[headerSize : headerSize+int(metadata.DataSize)]
-	switch metadata.Operation {
-	case 1: // cudaMemcpy
-		for retry := 0; retry < maxRetries; retry++ {
-			err := gpu.SafeMemcpy(unsafe.Pointer(uintptr(metadata.DstDevice)), unsafe.Pointer(&payload[0]), metadata.DataSize)
-			if err == nil {
-				s.log.Debugf("[worker-%d] Copied %d bytes to 0x%x", workerID, metadata.DataSize, metadata.DstDevice)
-				return
-			}
-			s.log.Warnf("[worker-%d] cudaMemcpy failed (attempt %d/%d): %v", workerID, retry+1, maxRetries, err)
-			time.Sleep(time.Duration(retry*100) * time.Millisecond)
-		}
-		s.log.Errorf("[worker-%d] Failed to copy %d bytes after %d retries", workerID, metadata.DataSize, maxRetries)
-	case 2:
-		s.log.Warnf("[worker-%d] cudaMemset not implemented yet", workerID)
-	default:
-		s.log.Errorf("[worker-%d] Unsupported operation: %d", workerID, metadata.Operation)
+	
+	// 智能路由内存访问
+	err := numa.RouteMemoryAccess(
+		uintptr(metadata.DstDevice),
+		uint(metadata.DataSize),
+		int(metadata.Operation),
+		payload,
+	)
+	
+	if err != nil {
+		s.log.Errorf("[worker-%d] Memory access failed: %v", workerID, err)
+	} else {
+		s.log.Debugf("[worker-%d] Successfully processed operation %d at 0x%x", 
+			workerID, metadata.Operation, metadata.DstDevice)
 	}
 }
 
@@ -366,32 +432,45 @@ func (s *CapnpServer) prepareParamBuffer(req proto.KernelLaunch) (cuda.DevicePtr
 func (s *CapnpServer) getCudaFunction(req proto.KernelLaunch) (cuda.Function, error) {
 	handle := uint64(req.FuncHandle())
 	
-	// 检查缓存
-	if f, ok := s.funcCache[handle]; ok {
-		return f, nil
+	// 检查缓存（读锁）
+	s.cacheLock.RLock()
+	cachedFunc, found := s.funcCache[handle]
+	module, moduleFound := s.modCache["default"]
+	s.cacheLock.RUnlock()
+	
+	if found {
+		return cachedFunc, nil
 	}
 	
 	// 获取函数元数据
+	s.cacheLock.RLock()
 	funcName, ok := s.funcMeta[handle]
+	s.cacheLock.RUnlock()
+	
 	if !ok {
 		funcName = req.Name() // 回退到请求中的名称
 		s.log.Warnf("函数句柄 %d 缺少元数据，使用请求名称: %s", handle, funcName)
 	}
 	
-	// 模块名称（简化处理）
-	modName := "default"
+	// 获取写锁
+	s.cacheLock.Lock()
+	defer s.cacheLock.Unlock()
+	
+	// 再次检查缓存，因为可能在等待锁时已被其他goroutine加载
+	if f, ok := s.funcCache[handle]; ok {
+		return f, nil
+	}
 	
 	// 检查模块缓存
-	module, ok := s.modCache[modName]
-	if !ok {
+	if !moduleFound {
 		// 加载模块
 		var err error
-		module, err = cuda.ModuleLoad(modName + ".cubin")
+		module, err = cuda.ModuleLoad("default.cubin")
 		if err != nil {
 			return 0, fmt.Errorf("模块加载失败: %w", err)
 		}
-		s.modCache[modName] = module
-		s.log.Infof("已加载模块: %s", modName)
+		s.modCache["default"] = module
+		s.log.Infof("已加载模块: default")
 	}
 	
 	// 获取函数
@@ -402,6 +481,7 @@ func (s *CapnpServer) getCudaFunction(req proto.KernelLaunch) (cuda.Function, er
 	
 	// 缓存函数
 	s.funcCache[handle] = cudaFunc
+	s.funcMeta[handle] = funcName // 确保元数据也被记录
 	s.log.Infof("已缓存函数: %s (句柄: %d)", funcName, handle)
 	return cudaFunc, nil
 }
@@ -410,6 +490,7 @@ func (s *CapnpServer) getCudaFunction(req proto.KernelLaunch) (cuda.Function, er
 
 func main() {
 	dataPort := flag.String("dataPort", "5555", "ZMQ data port")
+	routeFile := flag.String("routeFile", "config/numa_routes.json", "NUMA路由表文件")
 	flag.Parse()
 
 	viper.SetConfigName("config")
@@ -427,14 +508,56 @@ func main() {
 		panic(fmt.Sprintf("控制面网卡%s不存在: %v", controlIface, err))
 	}
 
+	// 加载NUMA路由表
+	routes, err := loadRoutes(*routeFile)
+	if err != nil {
+		log.Fatalf("加载NUMA路由表失败: %v", err)
+	}
+	net.InitRouteTable(routes)
+
 	server := NewCapnpServer()
 	go server.StartZMQReceiver(*dataPort)
+	
+	// 启动ZMQ接收器
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go net.StartReceiver(ctx)
 
 	addr := viper.GetString("server.address")
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		panic(fmt.Errorf("failed to listen on %s: %w", addr, err))
+}
+
+// loadRoutes 从JSON文件加载NUMA路由表
+func loadRoutes(filename string) (map[int]string, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
 	}
+	defer file.Close()
+
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	var routes map[string]string
+	if err := json.Unmarshal(data, &routes); err != nil {
+		return nil, err
+	}
+
+	// 转换字符串键为整数
+	result := make(map[int]string)
+	for k, v := range routes {
+		nodeID, err := strconv.Atoi(k)
+		if err != nil {
+			return nil, fmt.Errorf("无效的节点ID: %s", k)
+		}
+		result[nodeID] = v
+	}
+	return result, nil
+}
 	defer listener.Close()
 
 	sig := make(chan os.Signal, 1)
