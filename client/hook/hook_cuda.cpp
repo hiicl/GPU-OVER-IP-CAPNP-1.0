@@ -1,7 +1,12 @@
+// CUDA API Hook实现模块
+// 功能：
+//   1. 拦截CUDA运行时API调用
+//   2. 将内存分配/内核启动等操作转发到远程GPU
+//   3. 管理本地与远程GPU的内存映射关系
 #include "hook_cuda.h"
 #include "launcher_client.h"
 #include "zmq_manager.h"
-#include "context_manager.h" // 添加内存映射管理
+#include "context_manager.h"
 #include "hook-launcher.capnp.h"
 #include "cuda.capnp.h"
 #include <iostream>
@@ -12,16 +17,33 @@
 #include <kj/common.h>
 #include <kj/debug.h>
 
-using json = nlohmann::json;
+using json = nlohmann::json; // JSON解析库
 
-// 定义MemoryHandle结构体
+// AlignData: 数据对齐函数
+// 确保数据大小符合指定对齐要求
+// 参数：
+//   data - 需要对齐的数据向量
+//   alignment - 对齐字节数
+static void AlignData(std::vector<uint8_t>& data, size_t alignment) {
+    if (alignment <= 1) return;
+    
+    const size_t current_size = data.size();
+    const size_t padding = (alignment - (current_size % alignment)) % alignment;
+    
+    if (padding > 0) {
+        data.insert(data.end(), padding, 0);
+    }
+}
+
+// MemoryHandle: 内存句柄结构
+// 管理本地与远程GPU内存映射关系
 struct MemoryHandle {
     CUdeviceptr localPtr;
     uint64_t remoteHandle;
     int nodeId;
 };
 
-// 全局资源声明
+// 管理Hook组件的核心资源
 // 全局资源声明
 static std::unique_ptr<LauncherClient> g_launcher_client;
 static std::unique_ptr<ZmqManager> g_zmq_manager;
@@ -48,7 +70,8 @@ static cuMemcpyDtoH_t pOriginal_cuMemcpyDtoH = nullptr;
 static cuLaunchKernel_t pOriginal_cuLaunchKernel = nullptr;
 static cuModuleGetFunction_t pOriginal_cuModuleGetFunction = nullptr;
 
-// 加载原始函数
+// InitOriginalFunctions: 加载原始CUDA函数
+// 从nvcuda.dll获取原始函数指针用于后续调用
 void InitOriginalFunctions() {
     cudaModule = LoadLibraryA("nvcuda.dll");
     if (!cudaModule) {
@@ -63,7 +86,8 @@ void InitOriginalFunctions() {
     LOAD_ORIG(cuModuleGetFunction);
 }
 
-// Hooked cuModuleGetFunction
+// Hooked_cuModuleGetFunction: 拦截CUDA模块函数获取
+// 建立CUfunction指针与函数名的映射关系
 CUresult CUDAAPI Hooked_cuModuleGetFunction(CUfunction* hfunc, CUmodule hmod, const char* name) {
     std::lock_guard<std::mutex> lock(g_api_mutex);
     CUresult res = pOriginal_cuModuleGetFunction(hfunc, hmod, name);
@@ -74,7 +98,8 @@ CUresult CUDAAPI Hooked_cuModuleGetFunction(CUfunction* hfunc, CUmodule hmod, co
     return res;
 }
 
-// 状态监控线程实现
+// StatusMonitorThread: GPU状态监控线程
+// 定期获取各节点GPU使用状态
 void StatusMonitorThread() {
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(5));
@@ -89,7 +114,12 @@ void StatusMonitorThread() {
     }
 }
 
-// 完整的Hooked cuMemAlloc实现
+// Hooked_cuMemAlloc: 拦截内存分配请求
+// 将内存分配请求转发到远程GPU节点
+// 参数：
+//   dev_ptr - 返回的设备指针
+//   byte_size - 分配的内存大小
+// 返回值：CUDA错误码
 CUresult CUDAAPI Hooked_cuMemAlloc(CUdeviceptr* dev_ptr, size_t byte_size) {
     std::lock_guard<std::mutex> lock(g_api_mutex);
     if (!g_launcher_client || !g_launcher_client->isConnected())
@@ -119,7 +149,11 @@ CUresult CUDAAPI Hooked_cuMemAlloc(CUdeviceptr* dev_ptr, size_t byte_size) {
     return CUDA_SUCCESS;
 }
 
-// 完整的Hooked cuMemFree实现
+// Hooked_cuMemFree: 拦截内存释放请求
+// 将内存释放请求转发到远程GPU节点
+// 参数：
+//   dptr - 要释放的设备指针
+// 返回值：CUDA错误码
 CUresult CUDAAPI Hooked_cuMemFree(CUdeviceptr dptr) {
     std::lock_guard<std::mutex> lock(g_api_mutex);
     if (!g_launcher_client || !g_launcher_client->isConnected())
@@ -145,7 +179,12 @@ CUresult CUDAAPI Hooked_cuMemFree(CUdeviceptr dptr) {
     return CUDA_SUCCESS;
 }
 
-// 完整的Hooked cuMemcpyHtoD实现
+// Hooked_cuMemcpyHtoD: 拦截主机到设备内存复制
+// 参数：
+//   dstDevice - 目标设备地址
+//   srcHost - 源主机地址
+//   ByteCount - 复制字节数
+// 返回值：CUDA错误码
 CUresult CUDAAPI Hooked_cuMemcpyHtoD(CUdeviceptr dstDevice, const void* srcHost, size_t ByteCount) {
     std::lock_guard<std::mutex> lock(g_api_mutex);
     if (!g_launcher_client || !g_launcher_client->isConnected())
@@ -174,7 +213,12 @@ CUresult CUDAAPI Hooked_cuMemcpyHtoD(CUdeviceptr dstDevice, const void* srcHost,
     return CUDA_SUCCESS;
 }
 
-// 完整的Hooked cuMemcpyDtoH实现
+// Hooked_cuMemcpyDtoH: 拦截设备到主机内存复制
+// 参数：
+//   dstHost - 目标主机地址
+//   srcDevice - 源设备地址
+//   ByteCount - 复制字节数
+// 返回值：CUDA错误码
 CUresult CUDAAPI Hooked_cuMemcpyDtoH(void* dstHost, CUdeviceptr srcDevice, size_t ByteCount) {
     std::lock_guard<std::mutex> lock(g_api_mutex);
     if (!g_launcher_client || !g_launcher_client->isConnected())
@@ -203,7 +247,13 @@ CUresult CUDAAPI Hooked_cuMemcpyDtoH(void* dstHost, CUdeviceptr srcDevice, size_
     return CUDA_SUCCESS;
 }
 
-// 完整的Hooked cuLaunchKernel实现
+// Hooked_cuLaunchKernel: 拦截内核启动请求
+// 核心功能：
+//   1. 转换内核参数为跨节点协议
+//   2. 处理参数对齐要求
+//   3. 通过RPC发送到远程执行
+// 参数：标准cuLaunchKernel参数
+// 返回值：CUDA错误码
 CUresult CUDAAPI Hooked_cuLaunchKernel(
     CUfunction f,
     unsigned gridDimX, unsigned gridDimY, unsigned gridDimZ,
@@ -264,11 +314,24 @@ CUresult CUDAAPI Hooked_cuLaunchKernel(
         // 设置参数列表
         auto paramsBuilder = req.initParams(launch.getParams().size());
         for (int i = 0; i < launch.getParams().size(); i++) {
-            auto paramBuilder = paramsBuilder[i];
-            paramBuilder.setType(launch.getParams()[i].getType());
-            paramBuilder.setValue(launch.getParams()[i].getValue());
-            paramBuilder.setOffset(0); // 缓冲区偏移（暂未使用）
-            paramBuilder.setAlignment(4); // 对齐字节（默认4）
+    auto paramBuilder = paramsBuilder[i];
+    auto& param = launch.getParams()[i];
+    
+    // 获取对齐值（默认为4）
+    uint32_t alignment = param.getAlignment();
+    if (alignment == 0) alignment = 4;
+    
+    // 复制原始数据
+    auto value = param.getValue();
+    std::vector<uint8_t> alignedData(value.begin(), value.end());
+    
+    // 应用对齐填充
+    AlignData(alignedData, alignment);
+    
+    paramBuilder.setType(param.getType());
+    paramBuilder.setValue(kj::ArrayPtr<const uint8_t>(alignedData.data(), alignedData.size()));
+    paramBuilder.setOffset(0); // 缓冲区偏移（暂未使用）
+    paramBuilder.setAlignment(alignment);
         }
 
         auto response = req.send().wait(*g_wait_scope);
@@ -281,7 +344,14 @@ CUresult CUDAAPI Hooked_cuLaunchKernel(
     }
 }
 
-// 初始化与清理
+// 模块初始化与清理
+// 管理Hook组件的生命周期
+// InitializeHook: 初始化Hook组件
+// 功能：
+//   1. 加载原始CUDA函数
+//   2. 连接Launcher服务
+//   3. 初始化ZMQ通信
+//   4. 启动状态监控线程
 void InitializeHook() {
     // 初始化原始函数
     InitOriginalFunctions();
@@ -319,6 +389,8 @@ void InitializeHook() {
     std::cout << "[Hook] Initialized" << std::endl;
 }
 
+// CleanupHook: 清理Hook资源
+// 释放所有全局资源并断开连接
 void CleanupHook() {
     // 停止状态监控线程
     if (g_status_thread.joinable()) {

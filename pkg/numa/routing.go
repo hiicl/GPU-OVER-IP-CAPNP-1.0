@@ -1,16 +1,27 @@
+// NUMA内存访问路由模块
+// 负责根据内存地址所在的NUMA节点路由内存访问请求
 package numa
 
 import (
+	"fmt"
 	"syscall"
 	"unsafe"
+
+	"github.com/hiicl/GPU-over-IP-AC922/pkg/net"
+	"github.com/hiicl/GPU-over-IP-AC922/proto/proto"
 )
 
+// 内存操作类型常量定义
 const (
-	MEMCPY_OPERATION = 1
-	MEMSET_OPERATION = 2
+	MEMCPY_OPERATION = 1 // 内存复制操作
+	MEMSET_OPERATION = 2 // 内存设置操作
 )
 
-// GetAddressNode 获取内存地址所属NUMA节点
+// GetAddressNode 获取内存地址所属的NUMA节点
+// 参数：
+//   addr - 内存地址
+// 返回值：
+//   节点ID (失败返回-1)
 func GetAddressNode(addr uintptr) int {
 	var node int
 	_, _, errno := syscall.Syscall6(
@@ -28,7 +39,15 @@ func GetAddressNode(addr uintptr) int {
 	return node
 }
 
-// RouteMemoryAccess 路由内存访问
+// RouteMemoryAccess 路由内存访问请求
+// 根据目标地址所在NUMA节点决定本地或远程访问
+// 参数：
+//   addr - 目标内存地址
+//   size - 操作数据大小
+//   operation - 操作类型 (MEMCPY_OPERATION/MEMSET_OPERATION)
+//   payload - 操作数据负载
+// 返回值：
+//   错误信息
 func RouteMemoryAccess(addr uintptr, size uint, operation int, payload []byte) error {
 	localNode := GetCurrentNode()
 	targetNode := GetAddressNode(addr)
@@ -43,6 +62,14 @@ func RouteMemoryAccess(addr uintptr, size uint, operation int, payload []byte) e
 }
 
 // accessViaXBus 通过X-BUS进行节点内内存访问
+// 使用mmap创建共享内存区域实现高效节点内内存操作
+// 参数：
+//   addr - 目标内存地址
+//   size - 操作数据大小
+//   operation - 操作类型
+//   payload - 操作数据负载
+// 返回值：
+//   错误信息
 func accessViaXBus(addr uintptr, size uint, operation int, payload []byte) error {
 	dst := unsafe.Pointer(addr)
 	switch operation {
@@ -100,9 +127,27 @@ func accessViaXBus(addr uintptr, size uint, operation int, payload []byte) error
 }
 
 // accessViaRemote 通过Cap'n Proto/ZeroMQ进行跨节点访问
+// 将内存操作命令序列化并通过网络发送到目标NUMA节点
+// 参数：
+//   addr - 目标内存地址
+//   size - 操作数据大小
+//   operation - 操作类型
+//   targetNode - 目标NUMA节点ID
+//   payload - 操作数据负载
+// 返回值：
+//   错误信息
 func accessViaRemote(addr uintptr, size uint, operation int, targetNode int, payload []byte) error {
-	// 远程内存访问协议实现
-	// 将使用Cap'n Proto序列化和ZeroMQ传输
-	// 具体实现将在后续步骤中添加
+	// 构造内存复制命令
+	cmd := &proto.MemcopyCommand{
+		DstAddress: uint64(addr),
+		DataSize:   uint64(size),
+		OpType:     uint32(operation),
+		Data:       payload,
+	}
+
+	// 通过网络发送到目标NUMA节点
+	if err := net.SendToRemoteNUMA(targetNode, cmd); err != nil {
+		return fmt.Errorf("remote access failed: %w", err)
+	}
 	return nil
 }

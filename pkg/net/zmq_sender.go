@@ -1,20 +1,26 @@
+// ZMQ网络通信发送模块
+// 负责将内存操作命令通过ZeroMQ发送到目标NUMA节点
 package net
 
 import (
 	"fmt"
+	"hash/crc32"
 	"sync"
 
 	"github.com/pebbe/zmq4"
 	"github.com/hiicl/GPU-over-IP-AC922/proto/proto"
 )
 
+// 全局资源定义
 var (
-	zmqSocketMap   = make(map[string]*zmq4.Socket)
-	numaRouteTable = make(map[int]string)
-	mu             sync.RWMutex
+	zmqSocketMap   = make(map[string]*zmq4.Socket) // ZMQ套接字映射表（按IP地址）
+	numaRouteTable = make(map[int]string)           // NUMA节点到IP地址的路由表
+	mu             sync.RWMutex                    // 全局资源读写锁
 )
 
-// InitRouteTable 初始化NUMA节点到IP的映射表
+// InitRouteTable 初始化NUMA节点到IP地址的路由表
+// 参数：
+//   table - NUMA节点ID到IP地址的映射表
 func InitRouteTable(table map[int]string) {
 	mu.Lock()
 	defer mu.Unlock()
@@ -22,6 +28,15 @@ func InitRouteTable(table map[int]string) {
 }
 
 // SendToRemoteNUMA 发送内存操作命令到指定NUMA节点
+// 核心功能：
+//   1. 根据NUMA节点ID查找目标IP地址
+//   2. 建立或复用ZMQ套接字连接
+//   3. 计算并添加数据校验和
+//   4. 序列化并发送命令
+// 参数：
+//   numaID - 目标NUMA节点ID
+//   cmd - 内存操作命令结构体
+// 返回值：错误信息
 func SendToRemoteNUMA(numaID int, cmd *proto.MemcopyCommand) error {
 	mu.RLock()
 	ip, exists := numaRouteTable[numaID]
@@ -58,6 +73,8 @@ func SendToRemoteNUMA(numaID int, cmd *proto.MemcopyCommand) error {
 		zmqSocketMap[ip] = socket
 	}
 	
+	// 计算并设置校验和
+	cmd.Checksum = crc32.ChecksumIEEE(cmd.Data)
 	data, err := cmd.Marshal()
 	if err != nil {
 		return fmt.Errorf("failed to marshal command: %w", err)

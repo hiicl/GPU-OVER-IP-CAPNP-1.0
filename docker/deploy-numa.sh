@@ -75,10 +75,20 @@ deploy_numa_node() {
     
     echo "部署NUMA$node_id节点 (内存限制: ${MEM_LIMIT}MB, 显存占比: ${VMEM_RATIO})"
     
+    # 获取NUMA节点的OpenCAPI设备
+    ocapi_devices=$(numa-tool list-ocxl-devices --numa=$node_id)
+    
+    # 构建设备参数
+    device_opts=""
+    for device in $ocapi_devices; do
+        device_opts+=" --device $device"
+    done
+    
     docker run -d \
         --name numa$node_id-container \
         --cpuset-cpus=$cpus \
         --gpus="device=$gpus" \
+        $device_opts \
         --memory="${MEM_LIMIT}m" \
         -e NUMA_NODE=$node_id \
         -e VMEM_RATIO=$VMEM_RATIO \
@@ -102,5 +112,30 @@ case $NUMA_NODE in
         exit 1
         ;;
 esac
+
+# 添加容器健康检查
+check_container_health() {
+    container_name=$1
+    echo "检查容器 $container_name 的健康状态..."
+    
+    # 检查容器是否运行
+    if [ "$(docker inspect -f '{{.State.Running}}' $container_name)" != "true" ]; then
+        echo "错误：容器 $container_name 未运行"
+        return 1
+    fi
+    
+    # 检查OpenCAPI设备状态
+    docker exec $container_name numa-tool check-ocxl-health
+    return $?
+}
+
+# 等待容器启动
+sleep 5
+
+# 执行健康检查
+check_container_health "numa${NUMA_NODE}-container"
+if [ $? -ne 0 ]; then
+    echo "警告：容器健康检查未通过，请检查日志"
+fi
 
 echo "NUMA节点${NUMA_NODE}容器部署完成: numa${NUMA_NODE}-container"
