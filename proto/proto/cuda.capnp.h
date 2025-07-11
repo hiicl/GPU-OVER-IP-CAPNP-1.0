@@ -15,28 +15,20 @@
 #error "Version mismatch between generated code and library headers.  You must use the same version of the Cap'n Proto compiler and library."
 #endif
 
-#include "gpu-control.capnp.h"
+#include "common.capnp.h"
+#include "kernel.capnp.h"
 
 CAPNP_BEGIN_HEADER
 
 namespace capnp {
 namespace schemas {
 
-CAPNP_DECLARE_SCHEMA(d097e59a458bd5cf);
 CAPNP_DECLARE_SCHEMA(aa64c42860eecf63);
-CAPNP_DECLARE_SCHEMA(cf7152ec53c54e90);
-enum class Direction_cf7152ec53c54e90: uint16_t {
-  HOST_TO_DEVICE,
-  DEVICE_TO_HOST,
-  DEVICE_TO_DEVICE,
-};
-CAPNP_DECLARE_ENUM(Direction, cf7152ec53c54e90);
 CAPNP_DECLARE_SCHEMA(ddb50ac56f50ec53);
 CAPNP_DECLARE_SCHEMA(9de7a50f41d4cbd0);
 CAPNP_DECLARE_SCHEMA(92bc15fb0d1fcb65);
 CAPNP_DECLARE_SCHEMA(a0142208ca8277e0);
-CAPNP_DECLARE_SCHEMA(8d60a68601cbd804);
-CAPNP_DECLARE_SCHEMA(cc2802c3aee5a04a);
+CAPNP_DECLARE_SCHEMA(dacf4c24bade7b94);
 CAPNP_DECLARE_SCHEMA(b2bde6a78c1a0cb4);
 CAPNP_DECLARE_SCHEMA(d909ac68956b8ff9);
 CAPNP_DECLARE_SCHEMA(ba5df2daeb81d2b3);
@@ -67,25 +59,12 @@ CAPNP_DECLARE_SCHEMA(a58d7df87cb5c3bf);
 CAPNP_DECLARE_SCHEMA(c15f783825e674b3);
 CAPNP_DECLARE_SCHEMA(8cb1ea6893b2ef94);
 CAPNP_DECLARE_SCHEMA(fbbcc94269ba6a08);
+CAPNP_DECLARE_SCHEMA(8f45295c5e9b579b);
+CAPNP_DECLARE_SCHEMA(8174b4e554088fa5);
 
 }  // namespace schemas
 }  // namespace capnp
 
-
-struct CudaMemInfo {
-  CudaMemInfo() = delete;
-
-  class Reader;
-  class Builder;
-  class Pipeline;
-
-  struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(d097e59a458bd5cf, 2, 0)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
-  };
-};
 
 struct MemcpyParams {
   MemcpyParams() = delete;
@@ -95,14 +74,12 @@ struct MemcpyParams {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(aa64c42860eecf63, 4, 0)
+    CAPNP_DECLARE_STRUCT_HEADER(aa64c42860eecf63, 2, 2)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
   };
 };
-
-typedef ::capnp::schemas::Direction_cf7152ec53c54e90 Direction;
 
 struct StreamHandle {
   StreamHandle() = delete;
@@ -164,30 +141,15 @@ struct EventParams {
   };
 };
 
-struct BatchRunRequest {
-  BatchRunRequest() = delete;
+struct BatchKernelLaunch {
+  BatchKernelLaunch() = delete;
 
   class Reader;
   class Builder;
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(8d60a68601cbd804, 1, 1)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
-  };
-};
-
-struct BatchRunResponse {
-  BatchRunResponse() = delete;
-
-  class Reader;
-  class Builder;
-  class Pipeline;
-
-  struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(cc2802c3aee5a04a, 0, 1)
+    CAPNP_DECLARE_STRUCT_HEADER(dacf4c24bade7b94, 1, 1)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -245,6 +207,8 @@ struct CudaService {
   struct BatchKernelLaunchResults;
   struct MultiGpuCooperationParams;
   struct MultiGpuCooperationResults;
+  struct AllocAndWriteParams;
+  struct AllocAndWriteResults;
 
   #if !CAPNP_LITE
   struct _capnpPrivate {
@@ -292,7 +256,7 @@ struct CudaService::CudaMemAllocParams {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(be2dd3871d6c54ce, 0, 1)
+    CAPNP_DECLARE_STRUCT_HEADER(be2dd3871d6c54ce, 1, 0)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -674,88 +638,37 @@ struct CudaService::MultiGpuCooperationResults {
   };
 };
 
+struct CudaService::AllocAndWriteParams {
+  AllocAndWriteParams() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(8f45295c5e9b579b, 1, 1)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
+struct CudaService::AllocAndWriteResults {
+  AllocAndWriteResults() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(8174b4e554088fa5, 0, 1)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
 // =======================================================================================
-
-class CudaMemInfo::Reader {
-public:
-  typedef CudaMemInfo Reads;
-
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
-
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
-  }
-
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
-  }
-#endif  // !CAPNP_LITE
-
-  inline  ::uint64_t getAddr() const;
-
-  inline  ::uint64_t getSize() const;
-
-private:
-  ::capnp::_::StructReader _reader;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::List;
-  friend class ::capnp::MessageBuilder;
-  friend class ::capnp::Orphanage;
-};
-
-class CudaMemInfo::Builder {
-public:
-  typedef CudaMemInfo Builds;
-
-  Builder() = delete;  // Deleted to discourage incorrect usage.
-                       // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
-
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
-
-  inline  ::uint64_t getAddr();
-  inline void setAddr( ::uint64_t value);
-
-  inline  ::uint64_t getSize();
-  inline void setSize( ::uint64_t value);
-
-private:
-  ::capnp::_::StructBuilder _builder;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  friend class ::capnp::Orphanage;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-};
-
-#if !CAPNP_LITE
-class CudaMemInfo::Pipeline {
-public:
-  typedef CudaMemInfo Pipelines;
-
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
-
-private:
-  ::capnp::AnyPointer::Pipeline _typeless;
-  friend class ::capnp::PipelineHook;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-};
-#endif  // !CAPNP_LITE
 
 class MemcpyParams::Reader {
 public:
@@ -774,13 +687,15 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline  ::uint64_t getSrc() const;
+  inline bool hasSrc() const;
+  inline  ::MemoryHandle::Reader getSrc() const;
 
-  inline  ::uint64_t getDst() const;
+  inline bool hasDst() const;
+  inline  ::MemoryHandle::Reader getDst() const;
 
   inline  ::uint64_t getSize() const;
 
-  inline  ::Direction getDirection() const;
+  inline  ::TransferDirection getDirection() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -810,17 +725,25 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline  ::uint64_t getSrc();
-  inline void setSrc( ::uint64_t value);
+  inline bool hasSrc();
+  inline  ::MemoryHandle::Builder getSrc();
+  inline void setSrc( ::MemoryHandle::Reader value);
+  inline  ::MemoryHandle::Builder initSrc();
+  inline void adoptSrc(::capnp::Orphan< ::MemoryHandle>&& value);
+  inline ::capnp::Orphan< ::MemoryHandle> disownSrc();
 
-  inline  ::uint64_t getDst();
-  inline void setDst( ::uint64_t value);
+  inline bool hasDst();
+  inline  ::MemoryHandle::Builder getDst();
+  inline void setDst( ::MemoryHandle::Reader value);
+  inline  ::MemoryHandle::Builder initDst();
+  inline void adoptDst(::capnp::Orphan< ::MemoryHandle>&& value);
+  inline ::capnp::Orphan< ::MemoryHandle> disownDst();
 
   inline  ::uint64_t getSize();
   inline void setSize( ::uint64_t value);
 
-  inline  ::Direction getDirection();
-  inline void setDirection( ::Direction value);
+  inline  ::TransferDirection getDirection();
+  inline void setDirection( ::TransferDirection value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -840,6 +763,8 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
+  inline  ::MemoryHandle::Pipeline getSrc();
+  inline  ::MemoryHandle::Pipeline getDst();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -1152,9 +1077,9 @@ private:
 };
 #endif  // !CAPNP_LITE
 
-class BatchRunRequest::Reader {
+class BatchKernelLaunch::Reader {
 public:
-  typedef BatchRunRequest Reads;
+  typedef BatchKernelLaunch Reads;
 
   Reader() = default;
   inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
@@ -1170,7 +1095,7 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasRequests() const;
-  inline  ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>::Reader getRequests() const;
+  inline  ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>::Reader getRequests() const;
 
   inline  ::uint64_t getStream() const;
 
@@ -1186,9 +1111,9 @@ private:
   friend class ::capnp::Orphanage;
 };
 
-class BatchRunRequest::Builder {
+class BatchKernelLaunch::Builder {
 public:
-  typedef BatchRunRequest Builds;
+  typedef BatchKernelLaunch Builds;
 
   Builder() = delete;  // Deleted to discourage incorrect usage.
                        // You can explicitly initialize to nullptr instead.
@@ -1203,11 +1128,11 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasRequests();
-  inline  ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>::Builder getRequests();
-  inline void setRequests( ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>::Reader value);
-  inline  ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>::Builder initRequests(unsigned int size);
-  inline void adoptRequests(::capnp::Orphan< ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>> disownRequests();
+  inline  ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>::Builder getRequests();
+  inline void setRequests( ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>::Reader value);
+  inline  ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>::Builder initRequests(unsigned int size);
+  inline void adoptRequests(::capnp::Orphan< ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>> disownRequests();
 
   inline  ::uint64_t getStream();
   inline void setStream( ::uint64_t value);
@@ -1222,90 +1147,9 @@ private:
 };
 
 #if !CAPNP_LITE
-class BatchRunRequest::Pipeline {
+class BatchKernelLaunch::Pipeline {
 public:
-  typedef BatchRunRequest Pipelines;
-
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
-
-private:
-  ::capnp::AnyPointer::Pipeline _typeless;
-  friend class ::capnp::PipelineHook;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-};
-#endif  // !CAPNP_LITE
-
-class BatchRunResponse::Reader {
-public:
-  typedef BatchRunResponse Reads;
-
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
-
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
-  }
-
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
-  }
-#endif  // !CAPNP_LITE
-
-  inline bool hasResponses() const;
-  inline  ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>::Reader getResponses() const;
-
-private:
-  ::capnp::_::StructReader _reader;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::List;
-  friend class ::capnp::MessageBuilder;
-  friend class ::capnp::Orphanage;
-};
-
-class BatchRunResponse::Builder {
-public:
-  typedef BatchRunResponse Builds;
-
-  Builder() = delete;  // Deleted to discourage incorrect usage.
-                       // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
-
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
-
-  inline bool hasResponses();
-  inline  ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>::Builder getResponses();
-  inline void setResponses( ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>::Reader value);
-  inline  ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>::Builder initResponses(unsigned int size);
-  inline void adoptResponses(::capnp::Orphan< ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>> disownResponses();
-
-private:
-  ::capnp::_::StructBuilder _builder;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  friend class ::capnp::Orphanage;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-};
-
-#if !CAPNP_LITE
-class BatchRunResponse::Pipeline {
-public:
-  typedef BatchRunResponse Pipelines;
+  typedef BatchKernelLaunch Pipelines;
 
   inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
@@ -1463,6 +1307,8 @@ public:
       ::kj::Maybe< ::capnp::MessageSize> sizeHint = nullptr);
   ::capnp::Request< ::CudaService::MultiGpuCooperationParams,  ::CudaService::MultiGpuCooperationResults> multiGpuCooperationRequest(
       ::kj::Maybe< ::capnp::MessageSize> sizeHint = nullptr);
+  ::capnp::Request< ::CudaService::AllocAndWriteParams,  ::CudaService::AllocAndWriteResults> allocAndWriteRequest(
+      ::kj::Maybe< ::capnp::MessageSize> sizeHint = nullptr);
 
 protected:
   Client() = default;
@@ -1535,6 +1381,10 @@ protected:
   typedef  ::CudaService::MultiGpuCooperationResults MultiGpuCooperationResults;
   typedef ::capnp::CallContext<MultiGpuCooperationParams, MultiGpuCooperationResults> MultiGpuCooperationContext;
   virtual ::kj::Promise<void> multiGpuCooperation(MultiGpuCooperationContext context);
+  typedef  ::CudaService::AllocAndWriteParams AllocAndWriteParams;
+  typedef  ::CudaService::AllocAndWriteResults AllocAndWriteResults;
+  typedef ::capnp::CallContext<AllocAndWriteParams, AllocAndWriteResults> AllocAndWriteContext;
+  virtual ::kj::Promise<void> allocAndWrite(AllocAndWriteContext context);
 
   inline  ::CudaService::Client thisCap() {
     return ::capnp::Capability::Server::thisCap()
@@ -1717,8 +1567,7 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline bool hasInfo() const;
-  inline  ::CudaMemInfo::Reader getInfo() const;
+  inline  ::uint64_t getSize() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -1748,12 +1597,8 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline bool hasInfo();
-  inline  ::CudaMemInfo::Builder getInfo();
-  inline void setInfo( ::CudaMemInfo::Reader value);
-  inline  ::CudaMemInfo::Builder initInfo();
-  inline void adoptInfo(::capnp::Orphan< ::CudaMemInfo>&& value);
-  inline ::capnp::Orphan< ::CudaMemInfo> disownInfo();
+  inline  ::uint64_t getSize();
+  inline void setSize( ::uint64_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -1773,7 +1618,6 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
-  inline  ::CudaMemInfo::Pipeline getInfo();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -1800,7 +1644,7 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasResult() const;
-  inline  ::CudaMemInfo::Reader getResult() const;
+  inline  ::Result::Reader getResult() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -1831,11 +1675,11 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasResult();
-  inline  ::CudaMemInfo::Builder getResult();
-  inline void setResult( ::CudaMemInfo::Reader value);
-  inline  ::CudaMemInfo::Builder initResult();
-  inline void adoptResult(::capnp::Orphan< ::CudaMemInfo>&& value);
-  inline ::capnp::Orphan< ::CudaMemInfo> disownResult();
+  inline  ::Result::Builder getResult();
+  inline void setResult( ::Result::Reader value);
+  inline  ::Result::Builder initResult();
+  inline void adoptResult(::capnp::Orphan< ::Result>&& value);
+  inline ::capnp::Orphan< ::Result> disownResult();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -1855,7 +1699,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
-  inline  ::CudaMemInfo::Pipeline getResult();
+  inline  ::Result::Pipeline getResult();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -2045,8 +1889,8 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline bool hasInfo() const;
-  inline  ::CudaMemInfo::Reader getInfo() const;
+  inline bool hasHandle() const;
+  inline  ::MemoryHandle::Reader getHandle() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -2076,12 +1920,12 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline bool hasInfo();
-  inline  ::CudaMemInfo::Builder getInfo();
-  inline void setInfo( ::CudaMemInfo::Reader value);
-  inline  ::CudaMemInfo::Builder initInfo();
-  inline void adoptInfo(::capnp::Orphan< ::CudaMemInfo>&& value);
-  inline ::capnp::Orphan< ::CudaMemInfo> disownInfo();
+  inline bool hasHandle();
+  inline  ::MemoryHandle::Builder getHandle();
+  inline void setHandle( ::MemoryHandle::Reader value);
+  inline  ::MemoryHandle::Builder initHandle();
+  inline void adoptHandle(::capnp::Orphan< ::MemoryHandle>&& value);
+  inline ::capnp::Orphan< ::MemoryHandle> disownHandle();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -2101,7 +1945,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
-  inline  ::CudaMemInfo::Pipeline getInfo();
+  inline  ::MemoryHandle::Pipeline getHandle();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -2702,7 +2546,7 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasRequest() const;
-  inline  ::RunRequest::Reader getRequest() const;
+  inline  ::KernelLaunch::Reader getRequest() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -2733,11 +2577,11 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasRequest();
-  inline  ::RunRequest::Builder getRequest();
-  inline void setRequest( ::RunRequest::Reader value);
-  inline  ::RunRequest::Builder initRequest();
-  inline void adoptRequest(::capnp::Orphan< ::RunRequest>&& value);
-  inline ::capnp::Orphan< ::RunRequest> disownRequest();
+  inline  ::KernelLaunch::Builder getRequest();
+  inline void setRequest( ::KernelLaunch::Reader value);
+  inline  ::KernelLaunch::Builder initRequest();
+  inline void adoptRequest(::capnp::Orphan< ::KernelLaunch>&& value);
+  inline ::capnp::Orphan< ::KernelLaunch> disownRequest();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -2757,7 +2601,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
-  inline  ::RunRequest::Pipeline getRequest();
+  inline  ::KernelLaunch::Pipeline getRequest();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -2783,8 +2627,8 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline bool hasResponse() const;
-  inline  ::RunResponse::Reader getResponse() const;
+  inline bool hasAck() const;
+  inline  ::Ack::Reader getAck() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -2814,12 +2658,12 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline bool hasResponse();
-  inline  ::RunResponse::Builder getResponse();
-  inline void setResponse( ::RunResponse::Reader value);
-  inline  ::RunResponse::Builder initResponse();
-  inline void adoptResponse(::capnp::Orphan< ::RunResponse>&& value);
-  inline ::capnp::Orphan< ::RunResponse> disownResponse();
+  inline bool hasAck();
+  inline  ::Ack::Builder getAck();
+  inline void setAck( ::Ack::Reader value);
+  inline  ::Ack::Builder initAck();
+  inline void adoptAck(::capnp::Orphan< ::Ack>&& value);
+  inline ::capnp::Orphan< ::Ack> disownAck();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -2839,7 +2683,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
-  inline  ::RunResponse::Pipeline getResponse();
+  inline  ::Ack::Pipeline getAck();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -3522,7 +3366,7 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasRequest() const;
-  inline  ::BatchRunRequest::Reader getRequest() const;
+  inline  ::BatchKernelLaunch::Reader getRequest() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -3553,11 +3397,11 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasRequest();
-  inline  ::BatchRunRequest::Builder getRequest();
-  inline void setRequest( ::BatchRunRequest::Reader value);
-  inline  ::BatchRunRequest::Builder initRequest();
-  inline void adoptRequest(::capnp::Orphan< ::BatchRunRequest>&& value);
-  inline ::capnp::Orphan< ::BatchRunRequest> disownRequest();
+  inline  ::BatchKernelLaunch::Builder getRequest();
+  inline void setRequest( ::BatchKernelLaunch::Reader value);
+  inline  ::BatchKernelLaunch::Builder initRequest();
+  inline void adoptRequest(::capnp::Orphan< ::BatchKernelLaunch>&& value);
+  inline ::capnp::Orphan< ::BatchKernelLaunch> disownRequest();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -3577,7 +3421,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
-  inline  ::BatchRunRequest::Pipeline getRequest();
+  inline  ::BatchKernelLaunch::Pipeline getRequest();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -3603,8 +3447,8 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline bool hasResponse() const;
-  inline  ::BatchRunResponse::Reader getResponse() const;
+  inline bool hasAck() const;
+  inline  ::Ack::Reader getAck() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -3634,12 +3478,12 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline bool hasResponse();
-  inline  ::BatchRunResponse::Builder getResponse();
-  inline void setResponse( ::BatchRunResponse::Reader value);
-  inline  ::BatchRunResponse::Builder initResponse();
-  inline void adoptResponse(::capnp::Orphan< ::BatchRunResponse>&& value);
-  inline ::capnp::Orphan< ::BatchRunResponse> disownResponse();
+  inline bool hasAck();
+  inline  ::Ack::Builder getAck();
+  inline void setAck( ::Ack::Reader value);
+  inline  ::Ack::Builder initAck();
+  inline void adoptAck(::capnp::Orphan< ::Ack>&& value);
+  inline ::capnp::Orphan< ::Ack> disownAck();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -3659,7 +3503,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
-  inline  ::BatchRunResponse::Pipeline getResponse();
+  inline  ::Ack::Pipeline getAck();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -3832,90 +3676,280 @@ private:
 };
 #endif  // !CAPNP_LITE
 
+class CudaService::AllocAndWriteParams::Reader {
+public:
+  typedef AllocAndWriteParams Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline  ::uint64_t getSize() const;
+
+  inline bool hasData() const;
+  inline  ::capnp::Data::Reader getData() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class CudaService::AllocAndWriteParams::Builder {
+public:
+  typedef AllocAndWriteParams Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline  ::uint64_t getSize();
+  inline void setSize( ::uint64_t value);
+
+  inline bool hasData();
+  inline  ::capnp::Data::Builder getData();
+  inline void setData( ::capnp::Data::Reader value);
+  inline  ::capnp::Data::Builder initData(unsigned int size);
+  inline void adoptData(::capnp::Orphan< ::capnp::Data>&& value);
+  inline ::capnp::Orphan< ::capnp::Data> disownData();
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class CudaService::AllocAndWriteParams::Pipeline {
+public:
+  typedef AllocAndWriteParams Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
+class CudaService::AllocAndWriteResults::Reader {
+public:
+  typedef AllocAndWriteResults Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline bool hasResult() const;
+  inline  ::Result::Reader getResult() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class CudaService::AllocAndWriteResults::Builder {
+public:
+  typedef AllocAndWriteResults Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline bool hasResult();
+  inline  ::Result::Builder getResult();
+  inline void setResult( ::Result::Reader value);
+  inline  ::Result::Builder initResult();
+  inline void adoptResult(::capnp::Orphan< ::Result>&& value);
+  inline ::capnp::Orphan< ::Result> disownResult();
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class CudaService::AllocAndWriteResults::Pipeline {
+public:
+  typedef AllocAndWriteResults Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+  inline  ::Result::Pipeline getResult();
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
 // =======================================================================================
 
-inline  ::uint64_t CudaMemInfo::Reader::getAddr() const {
-  return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+inline bool MemcpyParams::Reader::hasSrc() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline bool MemcpyParams::Builder::hasSrc() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline  ::MemoryHandle::Reader MemcpyParams::Reader::getSrc() const {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline  ::MemoryHandle::Builder MemcpyParams::Builder::getSrc() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+#if !CAPNP_LITE
+inline  ::MemoryHandle::Pipeline MemcpyParams::Pipeline::getSrc() {
+  return  ::MemoryHandle::Pipeline(_typeless.getPointerField(0));
+}
+#endif  // !CAPNP_LITE
+inline void MemcpyParams::Builder::setSrc( ::MemoryHandle::Reader value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::MemoryHandle::Builder MemcpyParams::Builder::initSrc() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::init(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline void MemcpyParams::Builder::adoptSrc(
+    ::capnp::Orphan< ::MemoryHandle>&& value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::MemoryHandle> MemcpyParams::Builder::disownSrc() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
-inline  ::uint64_t CudaMemInfo::Builder::getAddr() {
-  return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+inline bool MemcpyParams::Reader::hasDst() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
 }
-inline void CudaMemInfo::Builder::setAddr( ::uint64_t value) {
-  _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+inline bool MemcpyParams::Builder::hasDst() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
 }
-
-inline  ::uint64_t CudaMemInfo::Reader::getSize() const {
-  return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+inline  ::MemoryHandle::Reader MemcpyParams::Reader::getDst() const {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
-
-inline  ::uint64_t CudaMemInfo::Builder::getSize() {
-  return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+inline  ::MemoryHandle::Builder MemcpyParams::Builder::getDst() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
-inline void CudaMemInfo::Builder::setSize( ::uint64_t value) {
-  _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+#if !CAPNP_LITE
+inline  ::MemoryHandle::Pipeline MemcpyParams::Pipeline::getDst() {
+  return  ::MemoryHandle::Pipeline(_typeless.getPointerField(1));
 }
-
-inline  ::uint64_t MemcpyParams::Reader::getSrc() const {
-  return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+#endif  // !CAPNP_LITE
+inline void MemcpyParams::Builder::setDst( ::MemoryHandle::Reader value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::set(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
 }
-
-inline  ::uint64_t MemcpyParams::Builder::getSrc() {
-  return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+inline  ::MemoryHandle::Builder MemcpyParams::Builder::initDst() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::init(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
-inline void MemcpyParams::Builder::setSrc( ::uint64_t value) {
-  _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+inline void MemcpyParams::Builder::adoptDst(
+    ::capnp::Orphan< ::MemoryHandle>&& value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::adopt(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
 }
-
-inline  ::uint64_t MemcpyParams::Reader::getDst() const {
-  return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-
-inline  ::uint64_t MemcpyParams::Builder::getDst() {
-  return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline void MemcpyParams::Builder::setDst( ::uint64_t value) {
-  _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+inline ::capnp::Orphan< ::MemoryHandle> MemcpyParams::Builder::disownDst() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::disown(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 
 inline  ::uint64_t MemcpyParams::Reader::getSize() const {
   return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
 
 inline  ::uint64_t MemcpyParams::Builder::getSize() {
   return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
 inline void MemcpyParams::Builder::setSize( ::uint64_t value) {
   _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<2>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::Direction MemcpyParams::Reader::getDirection() const {
-  return _reader.getDataField< ::Direction>(
-      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
+inline  ::TransferDirection MemcpyParams::Reader::getDirection() const {
+  return _reader.getDataField< ::TransferDirection>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS);
 }
 
-inline  ::Direction MemcpyParams::Builder::getDirection() {
-  return _builder.getDataField< ::Direction>(
-      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
+inline  ::TransferDirection MemcpyParams::Builder::getDirection() {
+  return _builder.getDataField< ::TransferDirection>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS);
 }
-inline void MemcpyParams::Builder::setDirection( ::Direction value) {
-  _builder.setDataField< ::Direction>(
-      ::capnp::bounded<12>() * ::capnp::ELEMENTS, value);
+inline void MemcpyParams::Builder::setDirection( ::TransferDirection value) {
+  _builder.setDataField< ::TransferDirection>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS, value);
 }
 
 inline  ::uint64_t StreamHandle::Reader::getHandle() const {
@@ -3974,86 +4008,52 @@ inline void EventParams::Builder::setFlags( ::uint32_t value) {
       ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }
 
-inline bool BatchRunRequest::Reader::hasRequests() const {
+inline bool BatchKernelLaunch::Reader::hasRequests() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline bool BatchRunRequest::Builder::hasRequests() {
+inline bool BatchKernelLaunch::Builder::hasRequests() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>::Reader BatchRunRequest::Reader::getRequests() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>>::get(_reader.getPointerField(
+inline  ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>::Reader BatchKernelLaunch::Reader::getRequests() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>::Builder BatchRunRequest::Builder::getRequests() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>>::get(_builder.getPointerField(
+inline  ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>::Builder BatchKernelLaunch::Builder::getRequests() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void BatchRunRequest::Builder::setRequests( ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>>::set(_builder.getPointerField(
+inline void BatchKernelLaunch::Builder::setRequests( ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>::Builder BatchRunRequest::Builder::initRequests(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>>::init(_builder.getPointerField(
+inline  ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>::Builder BatchKernelLaunch::Builder::initRequests(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), size);
 }
-inline void BatchRunRequest::Builder::adoptRequests(
-    ::capnp::Orphan< ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>>::adopt(_builder.getPointerField(
+inline void BatchKernelLaunch::Builder::adoptRequests(
+    ::capnp::Orphan< ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>> BatchRunRequest::Builder::disownRequests() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RunRequest,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>> BatchKernelLaunch::Builder::disownRequests() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::KernelLaunch,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
-inline  ::uint64_t BatchRunRequest::Reader::getStream() const {
+inline  ::uint64_t BatchKernelLaunch::Reader::getStream() const {
   return _reader.getDataField< ::uint64_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
 
-inline  ::uint64_t BatchRunRequest::Builder::getStream() {
+inline  ::uint64_t BatchKernelLaunch::Builder::getStream() {
   return _builder.getDataField< ::uint64_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
-inline void BatchRunRequest::Builder::setStream( ::uint64_t value) {
+inline void BatchKernelLaunch::Builder::setStream( ::uint64_t value) {
   _builder.setDataField< ::uint64_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
-}
-
-inline bool BatchRunResponse::Reader::hasResponses() const {
-  return !_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline bool BatchRunResponse::Builder::hasResponses() {
-  return !_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>::Reader BatchRunResponse::Reader::getResponses() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>>::get(_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline  ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>::Builder BatchRunResponse::Builder::getResponses() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>>::get(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline void BatchRunResponse::Builder::setResponses( ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>>::set(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
-}
-inline  ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>::Builder BatchRunResponse::Builder::initResponses(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>>::init(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), size);
-}
-inline void BatchRunResponse::Builder::adoptResponses(
-    ::capnp::Orphan< ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>> BatchRunResponse::Builder::disownResponses() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::RunResponse,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
 inline bool MultiGpuRequest::Reader::hasUuids() const {
@@ -4205,43 +4205,18 @@ inline ::capnp::Orphan< ::Ack> CudaService::CudaInitResults::Builder::disownAck(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
-inline bool CudaService::CudaMemAllocParams::Reader::hasInfo() const {
-  return !_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+inline  ::uint64_t CudaService::CudaMemAllocParams::Reader::getSize() const {
+  return _reader.getDataField< ::uint64_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
-inline bool CudaService::CudaMemAllocParams::Builder::hasInfo() {
-  return !_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+
+inline  ::uint64_t CudaService::CudaMemAllocParams::Builder::getSize() {
+  return _builder.getDataField< ::uint64_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
-inline  ::CudaMemInfo::Reader CudaService::CudaMemAllocParams::Reader::getInfo() const {
-  return ::capnp::_::PointerHelpers< ::CudaMemInfo>::get(_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline  ::CudaMemInfo::Builder CudaService::CudaMemAllocParams::Builder::getInfo() {
-  return ::capnp::_::PointerHelpers< ::CudaMemInfo>::get(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-#if !CAPNP_LITE
-inline  ::CudaMemInfo::Pipeline CudaService::CudaMemAllocParams::Pipeline::getInfo() {
-  return  ::CudaMemInfo::Pipeline(_typeless.getPointerField(0));
-}
-#endif  // !CAPNP_LITE
-inline void CudaService::CudaMemAllocParams::Builder::setInfo( ::CudaMemInfo::Reader value) {
-  ::capnp::_::PointerHelpers< ::CudaMemInfo>::set(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
-}
-inline  ::CudaMemInfo::Builder CudaService::CudaMemAllocParams::Builder::initInfo() {
-  return ::capnp::_::PointerHelpers< ::CudaMemInfo>::init(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline void CudaService::CudaMemAllocParams::Builder::adoptInfo(
-    ::capnp::Orphan< ::CudaMemInfo>&& value) {
-  ::capnp::_::PointerHelpers< ::CudaMemInfo>::adopt(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::CudaMemInfo> CudaService::CudaMemAllocParams::Builder::disownInfo() {
-  return ::capnp::_::PointerHelpers< ::CudaMemInfo>::disown(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
+inline void CudaService::CudaMemAllocParams::Builder::setSize( ::uint64_t value) {
+  _builder.setDataField< ::uint64_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool CudaService::CudaMemAllocResults::Reader::hasResult() const {
@@ -4252,34 +4227,34 @@ inline bool CudaService::CudaMemAllocResults::Builder::hasResult() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::CudaMemInfo::Reader CudaService::CudaMemAllocResults::Reader::getResult() const {
-  return ::capnp::_::PointerHelpers< ::CudaMemInfo>::get(_reader.getPointerField(
+inline  ::Result::Reader CudaService::CudaMemAllocResults::Reader::getResult() const {
+  return ::capnp::_::PointerHelpers< ::Result>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::CudaMemInfo::Builder CudaService::CudaMemAllocResults::Builder::getResult() {
-  return ::capnp::_::PointerHelpers< ::CudaMemInfo>::get(_builder.getPointerField(
+inline  ::Result::Builder CudaService::CudaMemAllocResults::Builder::getResult() {
+  return ::capnp::_::PointerHelpers< ::Result>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::CudaMemInfo::Pipeline CudaService::CudaMemAllocResults::Pipeline::getResult() {
-  return  ::CudaMemInfo::Pipeline(_typeless.getPointerField(0));
+inline  ::Result::Pipeline CudaService::CudaMemAllocResults::Pipeline::getResult() {
+  return  ::Result::Pipeline(_typeless.getPointerField(0));
 }
 #endif  // !CAPNP_LITE
-inline void CudaService::CudaMemAllocResults::Builder::setResult( ::CudaMemInfo::Reader value) {
-  ::capnp::_::PointerHelpers< ::CudaMemInfo>::set(_builder.getPointerField(
+inline void CudaService::CudaMemAllocResults::Builder::setResult( ::Result::Reader value) {
+  ::capnp::_::PointerHelpers< ::Result>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::CudaMemInfo::Builder CudaService::CudaMemAllocResults::Builder::initResult() {
-  return ::capnp::_::PointerHelpers< ::CudaMemInfo>::init(_builder.getPointerField(
+inline  ::Result::Builder CudaService::CudaMemAllocResults::Builder::initResult() {
+  return ::capnp::_::PointerHelpers< ::Result>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 inline void CudaService::CudaMemAllocResults::Builder::adoptResult(
-    ::capnp::Orphan< ::CudaMemInfo>&& value) {
-  ::capnp::_::PointerHelpers< ::CudaMemInfo>::adopt(_builder.getPointerField(
+    ::capnp::Orphan< ::Result>&& value) {
+  ::capnp::_::PointerHelpers< ::Result>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::CudaMemInfo> CudaService::CudaMemAllocResults::Builder::disownResult() {
-  return ::capnp::_::PointerHelpers< ::CudaMemInfo>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::Result> CudaService::CudaMemAllocResults::Builder::disownResult() {
+  return ::capnp::_::PointerHelpers< ::Result>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
@@ -4361,42 +4336,42 @@ inline ::capnp::Orphan< ::Ack> CudaService::CudaMemcpyResults::Builder::disownAc
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
-inline bool CudaService::CudaMemFreeParams::Reader::hasInfo() const {
+inline bool CudaService::CudaMemFreeParams::Reader::hasHandle() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline bool CudaService::CudaMemFreeParams::Builder::hasInfo() {
+inline bool CudaService::CudaMemFreeParams::Builder::hasHandle() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::CudaMemInfo::Reader CudaService::CudaMemFreeParams::Reader::getInfo() const {
-  return ::capnp::_::PointerHelpers< ::CudaMemInfo>::get(_reader.getPointerField(
+inline  ::MemoryHandle::Reader CudaService::CudaMemFreeParams::Reader::getHandle() const {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::CudaMemInfo::Builder CudaService::CudaMemFreeParams::Builder::getInfo() {
-  return ::capnp::_::PointerHelpers< ::CudaMemInfo>::get(_builder.getPointerField(
+inline  ::MemoryHandle::Builder CudaService::CudaMemFreeParams::Builder::getHandle() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::CudaMemInfo::Pipeline CudaService::CudaMemFreeParams::Pipeline::getInfo() {
-  return  ::CudaMemInfo::Pipeline(_typeless.getPointerField(0));
+inline  ::MemoryHandle::Pipeline CudaService::CudaMemFreeParams::Pipeline::getHandle() {
+  return  ::MemoryHandle::Pipeline(_typeless.getPointerField(0));
 }
 #endif  // !CAPNP_LITE
-inline void CudaService::CudaMemFreeParams::Builder::setInfo( ::CudaMemInfo::Reader value) {
-  ::capnp::_::PointerHelpers< ::CudaMemInfo>::set(_builder.getPointerField(
+inline void CudaService::CudaMemFreeParams::Builder::setHandle( ::MemoryHandle::Reader value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::CudaMemInfo::Builder CudaService::CudaMemFreeParams::Builder::initInfo() {
-  return ::capnp::_::PointerHelpers< ::CudaMemInfo>::init(_builder.getPointerField(
+inline  ::MemoryHandle::Builder CudaService::CudaMemFreeParams::Builder::initHandle() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void CudaService::CudaMemFreeParams::Builder::adoptInfo(
-    ::capnp::Orphan< ::CudaMemInfo>&& value) {
-  ::capnp::_::PointerHelpers< ::CudaMemInfo>::adopt(_builder.getPointerField(
+inline void CudaService::CudaMemFreeParams::Builder::adoptHandle(
+    ::capnp::Orphan< ::MemoryHandle>&& value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::CudaMemInfo> CudaService::CudaMemFreeParams::Builder::disownInfo() {
-  return ::capnp::_::PointerHelpers< ::CudaMemInfo>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::MemoryHandle> CudaService::CudaMemFreeParams::Builder::disownHandle() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
@@ -4681,73 +4656,73 @@ inline bool CudaService::CudaKernelLaunchParams::Builder::hasRequest() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::RunRequest::Reader CudaService::CudaKernelLaunchParams::Reader::getRequest() const {
-  return ::capnp::_::PointerHelpers< ::RunRequest>::get(_reader.getPointerField(
+inline  ::KernelLaunch::Reader CudaService::CudaKernelLaunchParams::Reader::getRequest() const {
+  return ::capnp::_::PointerHelpers< ::KernelLaunch>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::RunRequest::Builder CudaService::CudaKernelLaunchParams::Builder::getRequest() {
-  return ::capnp::_::PointerHelpers< ::RunRequest>::get(_builder.getPointerField(
+inline  ::KernelLaunch::Builder CudaService::CudaKernelLaunchParams::Builder::getRequest() {
+  return ::capnp::_::PointerHelpers< ::KernelLaunch>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::RunRequest::Pipeline CudaService::CudaKernelLaunchParams::Pipeline::getRequest() {
-  return  ::RunRequest::Pipeline(_typeless.getPointerField(0));
+inline  ::KernelLaunch::Pipeline CudaService::CudaKernelLaunchParams::Pipeline::getRequest() {
+  return  ::KernelLaunch::Pipeline(_typeless.getPointerField(0));
 }
 #endif  // !CAPNP_LITE
-inline void CudaService::CudaKernelLaunchParams::Builder::setRequest( ::RunRequest::Reader value) {
-  ::capnp::_::PointerHelpers< ::RunRequest>::set(_builder.getPointerField(
+inline void CudaService::CudaKernelLaunchParams::Builder::setRequest( ::KernelLaunch::Reader value) {
+  ::capnp::_::PointerHelpers< ::KernelLaunch>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::RunRequest::Builder CudaService::CudaKernelLaunchParams::Builder::initRequest() {
-  return ::capnp::_::PointerHelpers< ::RunRequest>::init(_builder.getPointerField(
+inline  ::KernelLaunch::Builder CudaService::CudaKernelLaunchParams::Builder::initRequest() {
+  return ::capnp::_::PointerHelpers< ::KernelLaunch>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 inline void CudaService::CudaKernelLaunchParams::Builder::adoptRequest(
-    ::capnp::Orphan< ::RunRequest>&& value) {
-  ::capnp::_::PointerHelpers< ::RunRequest>::adopt(_builder.getPointerField(
+    ::capnp::Orphan< ::KernelLaunch>&& value) {
+  ::capnp::_::PointerHelpers< ::KernelLaunch>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::RunRequest> CudaService::CudaKernelLaunchParams::Builder::disownRequest() {
-  return ::capnp::_::PointerHelpers< ::RunRequest>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::KernelLaunch> CudaService::CudaKernelLaunchParams::Builder::disownRequest() {
+  return ::capnp::_::PointerHelpers< ::KernelLaunch>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
-inline bool CudaService::CudaKernelLaunchResults::Reader::hasResponse() const {
+inline bool CudaService::CudaKernelLaunchResults::Reader::hasAck() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline bool CudaService::CudaKernelLaunchResults::Builder::hasResponse() {
+inline bool CudaService::CudaKernelLaunchResults::Builder::hasAck() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::RunResponse::Reader CudaService::CudaKernelLaunchResults::Reader::getResponse() const {
-  return ::capnp::_::PointerHelpers< ::RunResponse>::get(_reader.getPointerField(
+inline  ::Ack::Reader CudaService::CudaKernelLaunchResults::Reader::getAck() const {
+  return ::capnp::_::PointerHelpers< ::Ack>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::RunResponse::Builder CudaService::CudaKernelLaunchResults::Builder::getResponse() {
-  return ::capnp::_::PointerHelpers< ::RunResponse>::get(_builder.getPointerField(
+inline  ::Ack::Builder CudaService::CudaKernelLaunchResults::Builder::getAck() {
+  return ::capnp::_::PointerHelpers< ::Ack>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::RunResponse::Pipeline CudaService::CudaKernelLaunchResults::Pipeline::getResponse() {
-  return  ::RunResponse::Pipeline(_typeless.getPointerField(0));
+inline  ::Ack::Pipeline CudaService::CudaKernelLaunchResults::Pipeline::getAck() {
+  return  ::Ack::Pipeline(_typeless.getPointerField(0));
 }
 #endif  // !CAPNP_LITE
-inline void CudaService::CudaKernelLaunchResults::Builder::setResponse( ::RunResponse::Reader value) {
-  ::capnp::_::PointerHelpers< ::RunResponse>::set(_builder.getPointerField(
+inline void CudaService::CudaKernelLaunchResults::Builder::setAck( ::Ack::Reader value) {
+  ::capnp::_::PointerHelpers< ::Ack>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::RunResponse::Builder CudaService::CudaKernelLaunchResults::Builder::initResponse() {
-  return ::capnp::_::PointerHelpers< ::RunResponse>::init(_builder.getPointerField(
+inline  ::Ack::Builder CudaService::CudaKernelLaunchResults::Builder::initAck() {
+  return ::capnp::_::PointerHelpers< ::Ack>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void CudaService::CudaKernelLaunchResults::Builder::adoptResponse(
-    ::capnp::Orphan< ::RunResponse>&& value) {
-  ::capnp::_::PointerHelpers< ::RunResponse>::adopt(_builder.getPointerField(
+inline void CudaService::CudaKernelLaunchResults::Builder::adoptAck(
+    ::capnp::Orphan< ::Ack>&& value) {
+  ::capnp::_::PointerHelpers< ::Ack>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::RunResponse> CudaService::CudaKernelLaunchResults::Builder::disownResponse() {
-  return ::capnp::_::PointerHelpers< ::RunResponse>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::Ack> CudaService::CudaKernelLaunchResults::Builder::disownAck() {
+  return ::capnp::_::PointerHelpers< ::Ack>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
@@ -5071,73 +5046,73 @@ inline bool CudaService::BatchKernelLaunchParams::Builder::hasRequest() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::BatchRunRequest::Reader CudaService::BatchKernelLaunchParams::Reader::getRequest() const {
-  return ::capnp::_::PointerHelpers< ::BatchRunRequest>::get(_reader.getPointerField(
+inline  ::BatchKernelLaunch::Reader CudaService::BatchKernelLaunchParams::Reader::getRequest() const {
+  return ::capnp::_::PointerHelpers< ::BatchKernelLaunch>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::BatchRunRequest::Builder CudaService::BatchKernelLaunchParams::Builder::getRequest() {
-  return ::capnp::_::PointerHelpers< ::BatchRunRequest>::get(_builder.getPointerField(
+inline  ::BatchKernelLaunch::Builder CudaService::BatchKernelLaunchParams::Builder::getRequest() {
+  return ::capnp::_::PointerHelpers< ::BatchKernelLaunch>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::BatchRunRequest::Pipeline CudaService::BatchKernelLaunchParams::Pipeline::getRequest() {
-  return  ::BatchRunRequest::Pipeline(_typeless.getPointerField(0));
+inline  ::BatchKernelLaunch::Pipeline CudaService::BatchKernelLaunchParams::Pipeline::getRequest() {
+  return  ::BatchKernelLaunch::Pipeline(_typeless.getPointerField(0));
 }
 #endif  // !CAPNP_LITE
-inline void CudaService::BatchKernelLaunchParams::Builder::setRequest( ::BatchRunRequest::Reader value) {
-  ::capnp::_::PointerHelpers< ::BatchRunRequest>::set(_builder.getPointerField(
+inline void CudaService::BatchKernelLaunchParams::Builder::setRequest( ::BatchKernelLaunch::Reader value) {
+  ::capnp::_::PointerHelpers< ::BatchKernelLaunch>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::BatchRunRequest::Builder CudaService::BatchKernelLaunchParams::Builder::initRequest() {
-  return ::capnp::_::PointerHelpers< ::BatchRunRequest>::init(_builder.getPointerField(
+inline  ::BatchKernelLaunch::Builder CudaService::BatchKernelLaunchParams::Builder::initRequest() {
+  return ::capnp::_::PointerHelpers< ::BatchKernelLaunch>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 inline void CudaService::BatchKernelLaunchParams::Builder::adoptRequest(
-    ::capnp::Orphan< ::BatchRunRequest>&& value) {
-  ::capnp::_::PointerHelpers< ::BatchRunRequest>::adopt(_builder.getPointerField(
+    ::capnp::Orphan< ::BatchKernelLaunch>&& value) {
+  ::capnp::_::PointerHelpers< ::BatchKernelLaunch>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::BatchRunRequest> CudaService::BatchKernelLaunchParams::Builder::disownRequest() {
-  return ::capnp::_::PointerHelpers< ::BatchRunRequest>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::BatchKernelLaunch> CudaService::BatchKernelLaunchParams::Builder::disownRequest() {
+  return ::capnp::_::PointerHelpers< ::BatchKernelLaunch>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
-inline bool CudaService::BatchKernelLaunchResults::Reader::hasResponse() const {
+inline bool CudaService::BatchKernelLaunchResults::Reader::hasAck() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline bool CudaService::BatchKernelLaunchResults::Builder::hasResponse() {
+inline bool CudaService::BatchKernelLaunchResults::Builder::hasAck() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::BatchRunResponse::Reader CudaService::BatchKernelLaunchResults::Reader::getResponse() const {
-  return ::capnp::_::PointerHelpers< ::BatchRunResponse>::get(_reader.getPointerField(
+inline  ::Ack::Reader CudaService::BatchKernelLaunchResults::Reader::getAck() const {
+  return ::capnp::_::PointerHelpers< ::Ack>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::BatchRunResponse::Builder CudaService::BatchKernelLaunchResults::Builder::getResponse() {
-  return ::capnp::_::PointerHelpers< ::BatchRunResponse>::get(_builder.getPointerField(
+inline  ::Ack::Builder CudaService::BatchKernelLaunchResults::Builder::getAck() {
+  return ::capnp::_::PointerHelpers< ::Ack>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::BatchRunResponse::Pipeline CudaService::BatchKernelLaunchResults::Pipeline::getResponse() {
-  return  ::BatchRunResponse::Pipeline(_typeless.getPointerField(0));
+inline  ::Ack::Pipeline CudaService::BatchKernelLaunchResults::Pipeline::getAck() {
+  return  ::Ack::Pipeline(_typeless.getPointerField(0));
 }
 #endif  // !CAPNP_LITE
-inline void CudaService::BatchKernelLaunchResults::Builder::setResponse( ::BatchRunResponse::Reader value) {
-  ::capnp::_::PointerHelpers< ::BatchRunResponse>::set(_builder.getPointerField(
+inline void CudaService::BatchKernelLaunchResults::Builder::setAck( ::Ack::Reader value) {
+  ::capnp::_::PointerHelpers< ::Ack>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::BatchRunResponse::Builder CudaService::BatchKernelLaunchResults::Builder::initResponse() {
-  return ::capnp::_::PointerHelpers< ::BatchRunResponse>::init(_builder.getPointerField(
+inline  ::Ack::Builder CudaService::BatchKernelLaunchResults::Builder::initAck() {
+  return ::capnp::_::PointerHelpers< ::Ack>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void CudaService::BatchKernelLaunchResults::Builder::adoptResponse(
-    ::capnp::Orphan< ::BatchRunResponse>&& value) {
-  ::capnp::_::PointerHelpers< ::BatchRunResponse>::adopt(_builder.getPointerField(
+inline void CudaService::BatchKernelLaunchResults::Builder::adoptAck(
+    ::capnp::Orphan< ::Ack>&& value) {
+  ::capnp::_::PointerHelpers< ::Ack>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::BatchRunResponse> CudaService::BatchKernelLaunchResults::Builder::disownResponse() {
-  return ::capnp::_::PointerHelpers< ::BatchRunResponse>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::Ack> CudaService::BatchKernelLaunchResults::Builder::disownAck() {
+  return ::capnp::_::PointerHelpers< ::Ack>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
@@ -5216,6 +5191,93 @@ inline void CudaService::MultiGpuCooperationResults::Builder::adoptAck(
 }
 inline ::capnp::Orphan< ::Ack> CudaService::MultiGpuCooperationResults::Builder::disownAck() {
   return ::capnp::_::PointerHelpers< ::Ack>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+
+inline  ::uint64_t CudaService::AllocAndWriteParams::Reader::getSize() const {
+  return _reader.getDataField< ::uint64_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint64_t CudaService::AllocAndWriteParams::Builder::getSize() {
+  return _builder.getDataField< ::uint64_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+inline void CudaService::AllocAndWriteParams::Builder::setSize( ::uint64_t value) {
+  _builder.setDataField< ::uint64_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool CudaService::AllocAndWriteParams::Reader::hasData() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline bool CudaService::AllocAndWriteParams::Builder::hasData() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Data::Reader CudaService::AllocAndWriteParams::Reader::getData() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Data>::get(_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Data::Builder CudaService::AllocAndWriteParams::Builder::getData() {
+  return ::capnp::_::PointerHelpers< ::capnp::Data>::get(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline void CudaService::AllocAndWriteParams::Builder::setData( ::capnp::Data::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Data>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Data::Builder CudaService::AllocAndWriteParams::Builder::initData(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Data>::init(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), size);
+}
+inline void CudaService::AllocAndWriteParams::Builder::adoptData(
+    ::capnp::Orphan< ::capnp::Data>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Data>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Data> CudaService::AllocAndWriteParams::Builder::disownData() {
+  return ::capnp::_::PointerHelpers< ::capnp::Data>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+
+inline bool CudaService::AllocAndWriteResults::Reader::hasResult() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline bool CudaService::AllocAndWriteResults::Builder::hasResult() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline  ::Result::Reader CudaService::AllocAndWriteResults::Reader::getResult() const {
+  return ::capnp::_::PointerHelpers< ::Result>::get(_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline  ::Result::Builder CudaService::AllocAndWriteResults::Builder::getResult() {
+  return ::capnp::_::PointerHelpers< ::Result>::get(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+#if !CAPNP_LITE
+inline  ::Result::Pipeline CudaService::AllocAndWriteResults::Pipeline::getResult() {
+  return  ::Result::Pipeline(_typeless.getPointerField(0));
+}
+#endif  // !CAPNP_LITE
+inline void CudaService::AllocAndWriteResults::Builder::setResult( ::Result::Reader value) {
+  ::capnp::_::PointerHelpers< ::Result>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::Result::Builder CudaService::AllocAndWriteResults::Builder::initResult() {
+  return ::capnp::_::PointerHelpers< ::Result>::init(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline void CudaService::AllocAndWriteResults::Builder::adoptResult(
+    ::capnp::Orphan< ::Result>&& value) {
+  ::capnp::_::PointerHelpers< ::Result>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::Result> CudaService::AllocAndWriteResults::Builder::disownResult() {
+  return ::capnp::_::PointerHelpers< ::Result>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 

@@ -22,7 +22,6 @@ CAPNP_BEGIN_HEADER
 namespace capnp {
 namespace schemas {
 
-CAPNP_DECLARE_SCHEMA(9a6ef642818fc4ee);
 CAPNP_DECLARE_SCHEMA(ddb256ee5b6b53b3);
 CAPNP_DECLARE_SCHEMA(eb7186a22c3fa0de);
 CAPNP_DECLARE_SCHEMA(b5d15336d30e0dd1);
@@ -38,25 +37,12 @@ CAPNP_DECLARE_SCHEMA(a4ab519fa8915cb7);
 CAPNP_DECLARE_SCHEMA(8cad8defaf95e7b0);
 CAPNP_DECLARE_SCHEMA(bb47eae7bc02e6df);
 CAPNP_DECLARE_SCHEMA(8164a155f1640357);
+CAPNP_DECLARE_SCHEMA(8e06bfe25704b493);
+CAPNP_DECLARE_SCHEMA(9067a75daac545ad);
 
 }  // namespace schemas
 }  // namespace capnp
 
-
-struct AllocationResult {
-  AllocationResult() = delete;
-
-  class Reader;
-  class Builder;
-  class Pipeline;
-
-  struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(9a6ef642818fc4ee, 2, 0)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
-  };
-};
 
 struct MemcpyPlan {
   MemcpyPlan() = delete;
@@ -96,18 +82,18 @@ struct HookLauncher {
   class Server;
 #endif  // !CAPNP_LITE
 
-  struct RequestAllocationParams;
-  struct RequestAllocationResults;
-  struct RequestFreeParams;
-  struct RequestFreeResults;
   struct PlanMemcpyHtoDParams;
   struct PlanMemcpyHtoDResults;
   struct PlanMemcpyDtoHParams;
   struct PlanMemcpyDtoHResults;
-  struct LaunchKernelParams;
-  struct LaunchKernelResults;
   struct GetNodeStatusParams;
   struct GetNodeStatusResults;
+  struct PrefetchDataParams;
+  struct PrefetchDataResults;
+  struct MeasureBandwidthParams;
+  struct MeasureBandwidthResults;
+  struct TrackAsyncTaskParams;
+  struct TrackAsyncTaskResults;
 
   #if !CAPNP_LITE
   struct _capnpPrivate {
@@ -115,66 +101,6 @@ struct HookLauncher {
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
   };
   #endif  // !CAPNP_LITE
-};
-
-struct HookLauncher::RequestAllocationParams {
-  RequestAllocationParams() = delete;
-
-  class Reader;
-  class Builder;
-  class Pipeline;
-
-  struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(a000d051b28a6d94, 1, 0)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
-  };
-};
-
-struct HookLauncher::RequestAllocationResults {
-  RequestAllocationResults() = delete;
-
-  class Reader;
-  class Builder;
-  class Pipeline;
-
-  struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(d9ccdb1e5a73a940, 0, 1)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
-  };
-};
-
-struct HookLauncher::RequestFreeParams {
-  RequestFreeParams() = delete;
-
-  class Reader;
-  class Builder;
-  class Pipeline;
-
-  struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(eb3523cbe98a804f, 1, 0)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
-  };
-};
-
-struct HookLauncher::RequestFreeResults {
-  RequestFreeResults() = delete;
-
-  class Reader;
-  class Builder;
-  class Pipeline;
-
-  struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(fa389ebe41e98f39, 1, 0)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
-  };
 };
 
 struct HookLauncher::PlanMemcpyHtoDParams {
@@ -185,7 +111,7 @@ struct HookLauncher::PlanMemcpyHtoDParams {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(80b6bbac6ed09d85, 2, 0)
+    CAPNP_DECLARE_STRUCT_HEADER(a000d051b28a6d94, 1, 1)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -200,7 +126,7 @@ struct HookLauncher::PlanMemcpyHtoDResults {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(e76522c9a2f40b20, 0, 1)
+    CAPNP_DECLARE_STRUCT_HEADER(d9ccdb1e5a73a940, 0, 1)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -215,7 +141,7 @@ struct HookLauncher::PlanMemcpyDtoHParams {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(befc738967da08f4, 2, 0)
+    CAPNP_DECLARE_STRUCT_HEADER(eb3523cbe98a804f, 1, 1)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -230,37 +156,7 @@ struct HookLauncher::PlanMemcpyDtoHResults {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(cbbd2a831eac2f20, 0, 1)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
-  };
-};
-
-struct HookLauncher::LaunchKernelParams {
-  LaunchKernelParams() = delete;
-
-  class Reader;
-  class Builder;
-  class Pipeline;
-
-  struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(a4ab519fa8915cb7, 2, 2)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
-  };
-};
-
-struct HookLauncher::LaunchKernelResults {
-  LaunchKernelResults() = delete;
-
-  class Reader;
-  class Builder;
-  class Pipeline;
-
-  struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(8cad8defaf95e7b0, 1, 0)
+    CAPNP_DECLARE_STRUCT_HEADER(fa389ebe41e98f39, 0, 1)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -275,7 +171,7 @@ struct HookLauncher::GetNodeStatusParams {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(bb47eae7bc02e6df, 0, 0)
+    CAPNP_DECLARE_STRUCT_HEADER(80b6bbac6ed09d85, 0, 0)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -290,6 +186,96 @@ struct HookLauncher::GetNodeStatusResults {
   class Pipeline;
 
   struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(e76522c9a2f40b20, 0, 1)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
+struct HookLauncher::PrefetchDataParams {
+  PrefetchDataParams() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(befc738967da08f4, 0, 1)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
+struct HookLauncher::PrefetchDataResults {
+  PrefetchDataResults() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(cbbd2a831eac2f20, 0, 1)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
+struct HookLauncher::MeasureBandwidthParams {
+  MeasureBandwidthParams() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(a4ab519fa8915cb7, 0, 2)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
+struct HookLauncher::MeasureBandwidthResults {
+  MeasureBandwidthResults() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(8cad8defaf95e7b0, 0, 1)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
+struct HookLauncher::TrackAsyncTaskParams {
+  TrackAsyncTaskParams() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(bb47eae7bc02e6df, 1, 0)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
+struct HookLauncher::TrackAsyncTaskResults {
+  TrackAsyncTaskResults() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
     CAPNP_DECLARE_STRUCT_HEADER(8164a155f1640357, 0, 1)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
@@ -297,88 +283,37 @@ struct HookLauncher::GetNodeStatusResults {
   };
 };
 
+struct BandwidthResult {
+  BandwidthResult() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(8e06bfe25704b493, 1, 0)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
+struct TaskStatus {
+  TaskStatus() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(9067a75daac545ad, 1, 0)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
 // =======================================================================================
-
-class AllocationResult::Reader {
-public:
-  typedef AllocationResult Reads;
-
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
-
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
-  }
-
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
-  }
-#endif  // !CAPNP_LITE
-
-  inline  ::uint64_t getFakePtr() const;
-
-  inline  ::ErrorCode getError() const;
-
-private:
-  ::capnp::_::StructReader _reader;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::List;
-  friend class ::capnp::MessageBuilder;
-  friend class ::capnp::Orphanage;
-};
-
-class AllocationResult::Builder {
-public:
-  typedef AllocationResult Builds;
-
-  Builder() = delete;  // Deleted to discourage incorrect usage.
-                       // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
-
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
-
-  inline  ::uint64_t getFakePtr();
-  inline void setFakePtr( ::uint64_t value);
-
-  inline  ::ErrorCode getError();
-  inline void setError( ::ErrorCode value);
-
-private:
-  ::capnp::_::StructBuilder _builder;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  friend class ::capnp::Orphanage;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-};
-
-#if !CAPNP_LITE
-class AllocationResult::Pipeline {
-public:
-  typedef AllocationResult Pipelines;
-
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
-
-private:
-  ::capnp::AnyPointer::Pipeline _typeless;
-  friend class ::capnp::PipelineHook;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-};
-#endif  // !CAPNP_LITE
 
 class MemcpyPlan::Reader {
 public:
@@ -586,17 +521,17 @@ public:
   Client& operator=(Client& other);
   Client& operator=(Client&& other);
 
-  ::capnp::Request< ::HookLauncher::RequestAllocationParams,  ::HookLauncher::RequestAllocationResults> requestAllocationRequest(
-      ::kj::Maybe< ::capnp::MessageSize> sizeHint = nullptr);
-  ::capnp::Request< ::HookLauncher::RequestFreeParams,  ::HookLauncher::RequestFreeResults> requestFreeRequest(
-      ::kj::Maybe< ::capnp::MessageSize> sizeHint = nullptr);
   ::capnp::Request< ::HookLauncher::PlanMemcpyHtoDParams,  ::HookLauncher::PlanMemcpyHtoDResults> planMemcpyHtoDRequest(
       ::kj::Maybe< ::capnp::MessageSize> sizeHint = nullptr);
   ::capnp::Request< ::HookLauncher::PlanMemcpyDtoHParams,  ::HookLauncher::PlanMemcpyDtoHResults> planMemcpyDtoHRequest(
       ::kj::Maybe< ::capnp::MessageSize> sizeHint = nullptr);
-  ::capnp::Request< ::HookLauncher::LaunchKernelParams,  ::HookLauncher::LaunchKernelResults> launchKernelRequest(
-      ::kj::Maybe< ::capnp::MessageSize> sizeHint = nullptr);
   ::capnp::Request< ::HookLauncher::GetNodeStatusParams,  ::HookLauncher::GetNodeStatusResults> getNodeStatusRequest(
+      ::kj::Maybe< ::capnp::MessageSize> sizeHint = nullptr);
+  ::capnp::Request< ::HookLauncher::PrefetchDataParams,  ::HookLauncher::PrefetchDataResults> prefetchDataRequest(
+      ::kj::Maybe< ::capnp::MessageSize> sizeHint = nullptr);
+  ::capnp::Request< ::HookLauncher::MeasureBandwidthParams,  ::HookLauncher::MeasureBandwidthResults> measureBandwidthRequest(
+      ::kj::Maybe< ::capnp::MessageSize> sizeHint = nullptr);
+  ::capnp::Request< ::HookLauncher::TrackAsyncTaskParams,  ::HookLauncher::TrackAsyncTaskResults> trackAsyncTaskRequest(
       ::kj::Maybe< ::capnp::MessageSize> sizeHint = nullptr);
 
 protected:
@@ -614,14 +549,6 @@ public:
       override;
 
 protected:
-  typedef  ::HookLauncher::RequestAllocationParams RequestAllocationParams;
-  typedef  ::HookLauncher::RequestAllocationResults RequestAllocationResults;
-  typedef ::capnp::CallContext<RequestAllocationParams, RequestAllocationResults> RequestAllocationContext;
-  virtual ::kj::Promise<void> requestAllocation(RequestAllocationContext context);
-  typedef  ::HookLauncher::RequestFreeParams RequestFreeParams;
-  typedef  ::HookLauncher::RequestFreeResults RequestFreeResults;
-  typedef ::capnp::CallContext<RequestFreeParams, RequestFreeResults> RequestFreeContext;
-  virtual ::kj::Promise<void> requestFree(RequestFreeContext context);
   typedef  ::HookLauncher::PlanMemcpyHtoDParams PlanMemcpyHtoDParams;
   typedef  ::HookLauncher::PlanMemcpyHtoDResults PlanMemcpyHtoDResults;
   typedef ::capnp::CallContext<PlanMemcpyHtoDParams, PlanMemcpyHtoDResults> PlanMemcpyHtoDContext;
@@ -630,14 +557,22 @@ protected:
   typedef  ::HookLauncher::PlanMemcpyDtoHResults PlanMemcpyDtoHResults;
   typedef ::capnp::CallContext<PlanMemcpyDtoHParams, PlanMemcpyDtoHResults> PlanMemcpyDtoHContext;
   virtual ::kj::Promise<void> planMemcpyDtoH(PlanMemcpyDtoHContext context);
-  typedef  ::HookLauncher::LaunchKernelParams LaunchKernelParams;
-  typedef  ::HookLauncher::LaunchKernelResults LaunchKernelResults;
-  typedef ::capnp::CallContext<LaunchKernelParams, LaunchKernelResults> LaunchKernelContext;
-  virtual ::kj::Promise<void> launchKernel(LaunchKernelContext context);
   typedef  ::HookLauncher::GetNodeStatusParams GetNodeStatusParams;
   typedef  ::HookLauncher::GetNodeStatusResults GetNodeStatusResults;
   typedef ::capnp::CallContext<GetNodeStatusParams, GetNodeStatusResults> GetNodeStatusContext;
   virtual ::kj::Promise<void> getNodeStatus(GetNodeStatusContext context);
+  typedef  ::HookLauncher::PrefetchDataParams PrefetchDataParams;
+  typedef  ::HookLauncher::PrefetchDataResults PrefetchDataResults;
+  typedef ::capnp::CallContext<PrefetchDataParams, PrefetchDataResults> PrefetchDataContext;
+  virtual ::kj::Promise<void> prefetchData(PrefetchDataContext context);
+  typedef  ::HookLauncher::MeasureBandwidthParams MeasureBandwidthParams;
+  typedef  ::HookLauncher::MeasureBandwidthResults MeasureBandwidthResults;
+  typedef ::capnp::CallContext<MeasureBandwidthParams, MeasureBandwidthResults> MeasureBandwidthContext;
+  virtual ::kj::Promise<void> measureBandwidth(MeasureBandwidthContext context);
+  typedef  ::HookLauncher::TrackAsyncTaskParams TrackAsyncTaskParams;
+  typedef  ::HookLauncher::TrackAsyncTaskResults TrackAsyncTaskResults;
+  typedef ::capnp::CallContext<TrackAsyncTaskParams, TrackAsyncTaskResults> TrackAsyncTaskContext;
+  virtual ::kj::Promise<void> trackAsyncTask(TrackAsyncTaskContext context);
 
   inline  ::HookLauncher::Client thisCap() {
     return ::capnp::Capability::Server::thisCap()
@@ -647,316 +582,6 @@ protected:
   ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
       uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
-};
-#endif  // !CAPNP_LITE
-
-class HookLauncher::RequestAllocationParams::Reader {
-public:
-  typedef RequestAllocationParams Reads;
-
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
-
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
-  }
-
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
-  }
-#endif  // !CAPNP_LITE
-
-  inline  ::uint64_t getSize() const;
-
-private:
-  ::capnp::_::StructReader _reader;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::List;
-  friend class ::capnp::MessageBuilder;
-  friend class ::capnp::Orphanage;
-};
-
-class HookLauncher::RequestAllocationParams::Builder {
-public:
-  typedef RequestAllocationParams Builds;
-
-  Builder() = delete;  // Deleted to discourage incorrect usage.
-                       // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
-
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
-
-  inline  ::uint64_t getSize();
-  inline void setSize( ::uint64_t value);
-
-private:
-  ::capnp::_::StructBuilder _builder;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  friend class ::capnp::Orphanage;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-};
-
-#if !CAPNP_LITE
-class HookLauncher::RequestAllocationParams::Pipeline {
-public:
-  typedef RequestAllocationParams Pipelines;
-
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
-
-private:
-  ::capnp::AnyPointer::Pipeline _typeless;
-  friend class ::capnp::PipelineHook;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-};
-#endif  // !CAPNP_LITE
-
-class HookLauncher::RequestAllocationResults::Reader {
-public:
-  typedef RequestAllocationResults Reads;
-
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
-
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
-  }
-
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
-  }
-#endif  // !CAPNP_LITE
-
-  inline bool hasResult() const;
-  inline  ::AllocationResult::Reader getResult() const;
-
-private:
-  ::capnp::_::StructReader _reader;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::List;
-  friend class ::capnp::MessageBuilder;
-  friend class ::capnp::Orphanage;
-};
-
-class HookLauncher::RequestAllocationResults::Builder {
-public:
-  typedef RequestAllocationResults Builds;
-
-  Builder() = delete;  // Deleted to discourage incorrect usage.
-                       // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
-
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
-
-  inline bool hasResult();
-  inline  ::AllocationResult::Builder getResult();
-  inline void setResult( ::AllocationResult::Reader value);
-  inline  ::AllocationResult::Builder initResult();
-  inline void adoptResult(::capnp::Orphan< ::AllocationResult>&& value);
-  inline ::capnp::Orphan< ::AllocationResult> disownResult();
-
-private:
-  ::capnp::_::StructBuilder _builder;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  friend class ::capnp::Orphanage;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-};
-
-#if !CAPNP_LITE
-class HookLauncher::RequestAllocationResults::Pipeline {
-public:
-  typedef RequestAllocationResults Pipelines;
-
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
-
-  inline  ::AllocationResult::Pipeline getResult();
-private:
-  ::capnp::AnyPointer::Pipeline _typeless;
-  friend class ::capnp::PipelineHook;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-};
-#endif  // !CAPNP_LITE
-
-class HookLauncher::RequestFreeParams::Reader {
-public:
-  typedef RequestFreeParams Reads;
-
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
-
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
-  }
-
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
-  }
-#endif  // !CAPNP_LITE
-
-  inline  ::uint64_t getFakePtr() const;
-
-private:
-  ::capnp::_::StructReader _reader;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::List;
-  friend class ::capnp::MessageBuilder;
-  friend class ::capnp::Orphanage;
-};
-
-class HookLauncher::RequestFreeParams::Builder {
-public:
-  typedef RequestFreeParams Builds;
-
-  Builder() = delete;  // Deleted to discourage incorrect usage.
-                       // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
-
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
-
-  inline  ::uint64_t getFakePtr();
-  inline void setFakePtr( ::uint64_t value);
-
-private:
-  ::capnp::_::StructBuilder _builder;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  friend class ::capnp::Orphanage;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-};
-
-#if !CAPNP_LITE
-class HookLauncher::RequestFreeParams::Pipeline {
-public:
-  typedef RequestFreeParams Pipelines;
-
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
-
-private:
-  ::capnp::AnyPointer::Pipeline _typeless;
-  friend class ::capnp::PipelineHook;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-};
-#endif  // !CAPNP_LITE
-
-class HookLauncher::RequestFreeResults::Reader {
-public:
-  typedef RequestFreeResults Reads;
-
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
-
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
-  }
-
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
-  }
-#endif  // !CAPNP_LITE
-
-  inline  ::ErrorCode getError() const;
-
-private:
-  ::capnp::_::StructReader _reader;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::List;
-  friend class ::capnp::MessageBuilder;
-  friend class ::capnp::Orphanage;
-};
-
-class HookLauncher::RequestFreeResults::Builder {
-public:
-  typedef RequestFreeResults Builds;
-
-  Builder() = delete;  // Deleted to discourage incorrect usage.
-                       // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
-
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
-
-  inline  ::ErrorCode getError();
-  inline void setError( ::ErrorCode value);
-
-private:
-  ::capnp::_::StructBuilder _builder;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  friend class ::capnp::Orphanage;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-};
-
-#if !CAPNP_LITE
-class HookLauncher::RequestFreeResults::Pipeline {
-public:
-  typedef RequestFreeResults Pipelines;
-
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
-
-private:
-  ::capnp::AnyPointer::Pipeline _typeless;
-  friend class ::capnp::PipelineHook;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
 };
 #endif  // !CAPNP_LITE
 
@@ -977,7 +602,8 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline  ::uint64_t getDstFakePtr() const;
+  inline bool hasDstHandle() const;
+  inline  ::MemoryHandle::Reader getDstHandle() const;
 
   inline  ::uint64_t getSize() const;
 
@@ -1009,8 +635,12 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline  ::uint64_t getDstFakePtr();
-  inline void setDstFakePtr( ::uint64_t value);
+  inline bool hasDstHandle();
+  inline  ::MemoryHandle::Builder getDstHandle();
+  inline void setDstHandle( ::MemoryHandle::Reader value);
+  inline  ::MemoryHandle::Builder initDstHandle();
+  inline void adoptDstHandle(::capnp::Orphan< ::MemoryHandle>&& value);
+  inline ::capnp::Orphan< ::MemoryHandle> disownDstHandle();
 
   inline  ::uint64_t getSize();
   inline void setSize( ::uint64_t value);
@@ -1033,6 +663,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
+  inline  ::MemoryHandle::Pipeline getDstHandle();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -1140,7 +771,8 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline  ::uint64_t getSrcFakePtr() const;
+  inline bool hasSrcHandle() const;
+  inline  ::MemoryHandle::Reader getSrcHandle() const;
 
   inline  ::uint64_t getSize() const;
 
@@ -1172,8 +804,12 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline  ::uint64_t getSrcFakePtr();
-  inline void setSrcFakePtr( ::uint64_t value);
+  inline bool hasSrcHandle();
+  inline  ::MemoryHandle::Builder getSrcHandle();
+  inline void setSrcHandle( ::MemoryHandle::Reader value);
+  inline  ::MemoryHandle::Builder initSrcHandle();
+  inline void adoptSrcHandle(::capnp::Orphan< ::MemoryHandle>&& value);
+  inline ::capnp::Orphan< ::MemoryHandle> disownSrcHandle();
 
   inline  ::uint64_t getSize();
   inline void setSize( ::uint64_t value);
@@ -1196,6 +832,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
+  inline  ::MemoryHandle::Pipeline getSrcHandle();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -1278,188 +915,6 @@ public:
       : _typeless(kj::mv(typeless)) {}
 
   inline  ::MemcpyPlan::Pipeline getPlan();
-private:
-  ::capnp::AnyPointer::Pipeline _typeless;
-  friend class ::capnp::PipelineHook;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-};
-#endif  // !CAPNP_LITE
-
-class HookLauncher::LaunchKernelParams::Reader {
-public:
-  typedef LaunchKernelParams Reads;
-
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
-
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
-  }
-
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
-  }
-#endif  // !CAPNP_LITE
-
-  inline bool hasFunc() const;
-  inline  ::capnp::Text::Reader getFunc() const;
-
-  inline  ::uint32_t getGridDim() const;
-
-  inline  ::uint32_t getBlockDim() const;
-
-  inline  ::uint32_t getSharedMem() const;
-
-  inline bool hasParams() const;
-  inline  ::capnp::Data::Reader getParams() const;
-
-private:
-  ::capnp::_::StructReader _reader;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::List;
-  friend class ::capnp::MessageBuilder;
-  friend class ::capnp::Orphanage;
-};
-
-class HookLauncher::LaunchKernelParams::Builder {
-public:
-  typedef LaunchKernelParams Builds;
-
-  Builder() = delete;  // Deleted to discourage incorrect usage.
-                       // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
-
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
-
-  inline bool hasFunc();
-  inline  ::capnp::Text::Builder getFunc();
-  inline void setFunc( ::capnp::Text::Reader value);
-  inline  ::capnp::Text::Builder initFunc(unsigned int size);
-  inline void adoptFunc(::capnp::Orphan< ::capnp::Text>&& value);
-  inline ::capnp::Orphan< ::capnp::Text> disownFunc();
-
-  inline  ::uint32_t getGridDim();
-  inline void setGridDim( ::uint32_t value);
-
-  inline  ::uint32_t getBlockDim();
-  inline void setBlockDim( ::uint32_t value);
-
-  inline  ::uint32_t getSharedMem();
-  inline void setSharedMem( ::uint32_t value);
-
-  inline bool hasParams();
-  inline  ::capnp::Data::Builder getParams();
-  inline void setParams( ::capnp::Data::Reader value);
-  inline  ::capnp::Data::Builder initParams(unsigned int size);
-  inline void adoptParams(::capnp::Orphan< ::capnp::Data>&& value);
-  inline ::capnp::Orphan< ::capnp::Data> disownParams();
-
-private:
-  ::capnp::_::StructBuilder _builder;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  friend class ::capnp::Orphanage;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-};
-
-#if !CAPNP_LITE
-class HookLauncher::LaunchKernelParams::Pipeline {
-public:
-  typedef LaunchKernelParams Pipelines;
-
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
-
-private:
-  ::capnp::AnyPointer::Pipeline _typeless;
-  friend class ::capnp::PipelineHook;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-};
-#endif  // !CAPNP_LITE
-
-class HookLauncher::LaunchKernelResults::Reader {
-public:
-  typedef LaunchKernelResults Reads;
-
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
-
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
-  }
-
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
-  }
-#endif  // !CAPNP_LITE
-
-  inline  ::ErrorCode getError() const;
-
-private:
-  ::capnp::_::StructReader _reader;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::List;
-  friend class ::capnp::MessageBuilder;
-  friend class ::capnp::Orphanage;
-};
-
-class HookLauncher::LaunchKernelResults::Builder {
-public:
-  typedef LaunchKernelResults Builds;
-
-  Builder() = delete;  // Deleted to discourage incorrect usage.
-                       // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
-
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
-
-  inline  ::ErrorCode getError();
-  inline void setError( ::ErrorCode value);
-
-private:
-  ::capnp::_::StructBuilder _builder;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  friend class ::capnp::Orphanage;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-};
-
-#if !CAPNP_LITE
-class HookLauncher::LaunchKernelResults::Pipeline {
-public:
-  typedef LaunchKernelResults Pipelines;
-
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
-
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -1620,35 +1075,664 @@ private:
 };
 #endif  // !CAPNP_LITE
 
+class HookLauncher::PrefetchDataParams::Reader {
+public:
+  typedef PrefetchDataParams Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline bool hasHandle() const;
+  inline  ::MemoryHandle::Reader getHandle() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class HookLauncher::PrefetchDataParams::Builder {
+public:
+  typedef PrefetchDataParams Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline bool hasHandle();
+  inline  ::MemoryHandle::Builder getHandle();
+  inline void setHandle( ::MemoryHandle::Reader value);
+  inline  ::MemoryHandle::Builder initHandle();
+  inline void adoptHandle(::capnp::Orphan< ::MemoryHandle>&& value);
+  inline ::capnp::Orphan< ::MemoryHandle> disownHandle();
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class HookLauncher::PrefetchDataParams::Pipeline {
+public:
+  typedef PrefetchDataParams Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+  inline  ::MemoryHandle::Pipeline getHandle();
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
+class HookLauncher::PrefetchDataResults::Reader {
+public:
+  typedef PrefetchDataResults Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline bool hasAck() const;
+  inline  ::Ack::Reader getAck() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class HookLauncher::PrefetchDataResults::Builder {
+public:
+  typedef PrefetchDataResults Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline bool hasAck();
+  inline  ::Ack::Builder getAck();
+  inline void setAck( ::Ack::Reader value);
+  inline  ::Ack::Builder initAck();
+  inline void adoptAck(::capnp::Orphan< ::Ack>&& value);
+  inline ::capnp::Orphan< ::Ack> disownAck();
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class HookLauncher::PrefetchDataResults::Pipeline {
+public:
+  typedef PrefetchDataResults Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+  inline  ::Ack::Pipeline getAck();
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
+class HookLauncher::MeasureBandwidthParams::Reader {
+public:
+  typedef MeasureBandwidthParams Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline bool hasSrc() const;
+  inline  ::capnp::Text::Reader getSrc() const;
+
+  inline bool hasDst() const;
+  inline  ::capnp::Text::Reader getDst() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class HookLauncher::MeasureBandwidthParams::Builder {
+public:
+  typedef MeasureBandwidthParams Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline bool hasSrc();
+  inline  ::capnp::Text::Builder getSrc();
+  inline void setSrc( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initSrc(unsigned int size);
+  inline void adoptSrc(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownSrc();
+
+  inline bool hasDst();
+  inline  ::capnp::Text::Builder getDst();
+  inline void setDst( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initDst(unsigned int size);
+  inline void adoptDst(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownDst();
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class HookLauncher::MeasureBandwidthParams::Pipeline {
+public:
+  typedef MeasureBandwidthParams Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
+class HookLauncher::MeasureBandwidthResults::Reader {
+public:
+  typedef MeasureBandwidthResults Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline bool hasResult() const;
+  inline  ::BandwidthResult::Reader getResult() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class HookLauncher::MeasureBandwidthResults::Builder {
+public:
+  typedef MeasureBandwidthResults Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline bool hasResult();
+  inline  ::BandwidthResult::Builder getResult();
+  inline void setResult( ::BandwidthResult::Reader value);
+  inline  ::BandwidthResult::Builder initResult();
+  inline void adoptResult(::capnp::Orphan< ::BandwidthResult>&& value);
+  inline ::capnp::Orphan< ::BandwidthResult> disownResult();
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class HookLauncher::MeasureBandwidthResults::Pipeline {
+public:
+  typedef MeasureBandwidthResults Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+  inline  ::BandwidthResult::Pipeline getResult();
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
+class HookLauncher::TrackAsyncTaskParams::Reader {
+public:
+  typedef TrackAsyncTaskParams Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline  ::uint64_t getTaskId() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class HookLauncher::TrackAsyncTaskParams::Builder {
+public:
+  typedef TrackAsyncTaskParams Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline  ::uint64_t getTaskId();
+  inline void setTaskId( ::uint64_t value);
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class HookLauncher::TrackAsyncTaskParams::Pipeline {
+public:
+  typedef TrackAsyncTaskParams Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
+class HookLauncher::TrackAsyncTaskResults::Reader {
+public:
+  typedef TrackAsyncTaskResults Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline bool hasStatus() const;
+  inline  ::TaskStatus::Reader getStatus() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class HookLauncher::TrackAsyncTaskResults::Builder {
+public:
+  typedef TrackAsyncTaskResults Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline bool hasStatus();
+  inline  ::TaskStatus::Builder getStatus();
+  inline void setStatus( ::TaskStatus::Reader value);
+  inline  ::TaskStatus::Builder initStatus();
+  inline void adoptStatus(::capnp::Orphan< ::TaskStatus>&& value);
+  inline ::capnp::Orphan< ::TaskStatus> disownStatus();
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class HookLauncher::TrackAsyncTaskResults::Pipeline {
+public:
+  typedef TrackAsyncTaskResults Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+  inline  ::TaskStatus::Pipeline getStatus();
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
+class BandwidthResult::Reader {
+public:
+  typedef BandwidthResult Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline float getThroughput() const;
+
+  inline float getLatency() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class BandwidthResult::Builder {
+public:
+  typedef BandwidthResult Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline float getThroughput();
+  inline void setThroughput(float value);
+
+  inline float getLatency();
+  inline void setLatency(float value);
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class BandwidthResult::Pipeline {
+public:
+  typedef BandwidthResult Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
+class TaskStatus::Reader {
+public:
+  typedef TaskStatus Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline  ::uint8_t getProgress() const;
+
+  inline  ::uint32_t getEstimatedTime() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class TaskStatus::Builder {
+public:
+  typedef TaskStatus Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline  ::uint8_t getProgress();
+  inline void setProgress( ::uint8_t value);
+
+  inline  ::uint32_t getEstimatedTime();
+  inline void setEstimatedTime( ::uint32_t value);
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class TaskStatus::Pipeline {
+public:
+  typedef TaskStatus Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
 // =======================================================================================
-
-inline  ::uint64_t AllocationResult::Reader::getFakePtr() const {
-  return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-
-inline  ::uint64_t AllocationResult::Builder::getFakePtr() {
-  return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-inline void AllocationResult::Builder::setFakePtr( ::uint64_t value) {
-  _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::ErrorCode AllocationResult::Reader::getError() const {
-  return _reader.getDataField< ::ErrorCode>(
-      ::capnp::bounded<4>() * ::capnp::ELEMENTS);
-}
-
-inline  ::ErrorCode AllocationResult::Builder::getError() {
-  return _builder.getDataField< ::ErrorCode>(
-      ::capnp::bounded<4>() * ::capnp::ELEMENTS);
-}
-inline void AllocationResult::Builder::setError( ::ErrorCode value) {
-  _builder.setDataField< ::ErrorCode>(
-      ::capnp::bounded<4>() * ::capnp::ELEMENTS, value);
-}
 
 inline bool MemcpyPlan::Reader::hasTargetServerIp() const {
   return !_reader.getPointerField(
@@ -1812,113 +1896,57 @@ inline  ::HookLauncher::Client& HookLauncher::Client::operator=(Client&& other) 
 }
 
 #endif  // !CAPNP_LITE
-inline  ::uint64_t HookLauncher::RequestAllocationParams::Reader::getSize() const {
-  return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-
-inline  ::uint64_t HookLauncher::RequestAllocationParams::Builder::getSize() {
-  return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-inline void HookLauncher::RequestAllocationParams::Builder::setSize( ::uint64_t value) {
-  _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
-}
-
-inline bool HookLauncher::RequestAllocationResults::Reader::hasResult() const {
+inline bool HookLauncher::PlanMemcpyHtoDParams::Reader::hasDstHandle() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline bool HookLauncher::RequestAllocationResults::Builder::hasResult() {
+inline bool HookLauncher::PlanMemcpyHtoDParams::Builder::hasDstHandle() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::AllocationResult::Reader HookLauncher::RequestAllocationResults::Reader::getResult() const {
-  return ::capnp::_::PointerHelpers< ::AllocationResult>::get(_reader.getPointerField(
+inline  ::MemoryHandle::Reader HookLauncher::PlanMemcpyHtoDParams::Reader::getDstHandle() const {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::AllocationResult::Builder HookLauncher::RequestAllocationResults::Builder::getResult() {
-  return ::capnp::_::PointerHelpers< ::AllocationResult>::get(_builder.getPointerField(
+inline  ::MemoryHandle::Builder HookLauncher::PlanMemcpyHtoDParams::Builder::getDstHandle() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::AllocationResult::Pipeline HookLauncher::RequestAllocationResults::Pipeline::getResult() {
-  return  ::AllocationResult::Pipeline(_typeless.getPointerField(0));
+inline  ::MemoryHandle::Pipeline HookLauncher::PlanMemcpyHtoDParams::Pipeline::getDstHandle() {
+  return  ::MemoryHandle::Pipeline(_typeless.getPointerField(0));
 }
 #endif  // !CAPNP_LITE
-inline void HookLauncher::RequestAllocationResults::Builder::setResult( ::AllocationResult::Reader value) {
-  ::capnp::_::PointerHelpers< ::AllocationResult>::set(_builder.getPointerField(
+inline void HookLauncher::PlanMemcpyHtoDParams::Builder::setDstHandle( ::MemoryHandle::Reader value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::AllocationResult::Builder HookLauncher::RequestAllocationResults::Builder::initResult() {
-  return ::capnp::_::PointerHelpers< ::AllocationResult>::init(_builder.getPointerField(
+inline  ::MemoryHandle::Builder HookLauncher::PlanMemcpyHtoDParams::Builder::initDstHandle() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void HookLauncher::RequestAllocationResults::Builder::adoptResult(
-    ::capnp::Orphan< ::AllocationResult>&& value) {
-  ::capnp::_::PointerHelpers< ::AllocationResult>::adopt(_builder.getPointerField(
+inline void HookLauncher::PlanMemcpyHtoDParams::Builder::adoptDstHandle(
+    ::capnp::Orphan< ::MemoryHandle>&& value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::AllocationResult> HookLauncher::RequestAllocationResults::Builder::disownResult() {
-  return ::capnp::_::PointerHelpers< ::AllocationResult>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::MemoryHandle> HookLauncher::PlanMemcpyHtoDParams::Builder::disownDstHandle() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-
-inline  ::uint64_t HookLauncher::RequestFreeParams::Reader::getFakePtr() const {
-  return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-
-inline  ::uint64_t HookLauncher::RequestFreeParams::Builder::getFakePtr() {
-  return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-inline void HookLauncher::RequestFreeParams::Builder::setFakePtr( ::uint64_t value) {
-  _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::ErrorCode HookLauncher::RequestFreeResults::Reader::getError() const {
-  return _reader.getDataField< ::ErrorCode>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-
-inline  ::ErrorCode HookLauncher::RequestFreeResults::Builder::getError() {
-  return _builder.getDataField< ::ErrorCode>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-inline void HookLauncher::RequestFreeResults::Builder::setError( ::ErrorCode value) {
-  _builder.setDataField< ::ErrorCode>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::uint64_t HookLauncher::PlanMemcpyHtoDParams::Reader::getDstFakePtr() const {
-  return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-
-inline  ::uint64_t HookLauncher::PlanMemcpyHtoDParams::Builder::getDstFakePtr() {
-  return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-inline void HookLauncher::PlanMemcpyHtoDParams::Builder::setDstFakePtr( ::uint64_t value) {
-  _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }
 
 inline  ::uint64_t HookLauncher::PlanMemcpyHtoDParams::Reader::getSize() const {
   return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
 
 inline  ::uint64_t HookLauncher::PlanMemcpyHtoDParams::Builder::getSize() {
   return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
 inline void HookLauncher::PlanMemcpyHtoDParams::Builder::setSize( ::uint64_t value) {
   _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool HookLauncher::PlanMemcpyHtoDResults::Reader::hasPlan() const {
@@ -1960,32 +1988,57 @@ inline ::capnp::Orphan< ::MemcpyPlan> HookLauncher::PlanMemcpyHtoDResults::Build
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
-inline  ::uint64_t HookLauncher::PlanMemcpyDtoHParams::Reader::getSrcFakePtr() const {
-  return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+inline bool HookLauncher::PlanMemcpyDtoHParams::Reader::hasSrcHandle() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-
-inline  ::uint64_t HookLauncher::PlanMemcpyDtoHParams::Builder::getSrcFakePtr() {
-  return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+inline bool HookLauncher::PlanMemcpyDtoHParams::Builder::hasSrcHandle() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline void HookLauncher::PlanMemcpyDtoHParams::Builder::setSrcFakePtr( ::uint64_t value) {
-  _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+inline  ::MemoryHandle::Reader HookLauncher::PlanMemcpyDtoHParams::Reader::getSrcHandle() const {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline  ::MemoryHandle::Builder HookLauncher::PlanMemcpyDtoHParams::Builder::getSrcHandle() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+#if !CAPNP_LITE
+inline  ::MemoryHandle::Pipeline HookLauncher::PlanMemcpyDtoHParams::Pipeline::getSrcHandle() {
+  return  ::MemoryHandle::Pipeline(_typeless.getPointerField(0));
+}
+#endif  // !CAPNP_LITE
+inline void HookLauncher::PlanMemcpyDtoHParams::Builder::setSrcHandle( ::MemoryHandle::Reader value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::MemoryHandle::Builder HookLauncher::PlanMemcpyDtoHParams::Builder::initSrcHandle() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::init(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline void HookLauncher::PlanMemcpyDtoHParams::Builder::adoptSrcHandle(
+    ::capnp::Orphan< ::MemoryHandle>&& value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::MemoryHandle> HookLauncher::PlanMemcpyDtoHParams::Builder::disownSrcHandle() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
 inline  ::uint64_t HookLauncher::PlanMemcpyDtoHParams::Reader::getSize() const {
   return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
 
 inline  ::uint64_t HookLauncher::PlanMemcpyDtoHParams::Builder::getSize() {
   return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
 inline void HookLauncher::PlanMemcpyDtoHParams::Builder::setSize( ::uint64_t value) {
   _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool HookLauncher::PlanMemcpyDtoHResults::Reader::hasPlan() const {
@@ -2027,130 +2080,6 @@ inline ::capnp::Orphan< ::MemcpyPlan> HookLauncher::PlanMemcpyDtoHResults::Build
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
-inline bool HookLauncher::LaunchKernelParams::Reader::hasFunc() const {
-  return !_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline bool HookLauncher::LaunchKernelParams::Builder::hasFunc() {
-  return !_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::Text::Reader HookLauncher::LaunchKernelParams::Reader::getFunc() const {
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline  ::capnp::Text::Builder HookLauncher::LaunchKernelParams::Builder::getFunc() {
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline void HookLauncher::LaunchKernelParams::Builder::setFunc( ::capnp::Text::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
-}
-inline  ::capnp::Text::Builder HookLauncher::LaunchKernelParams::Builder::initFunc(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), size);
-}
-inline void HookLauncher::LaunchKernelParams::Builder::adoptFunc(
-    ::capnp::Orphan< ::capnp::Text>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::Text> HookLauncher::LaunchKernelParams::Builder::disownFunc() {
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-
-inline  ::uint32_t HookLauncher::LaunchKernelParams::Reader::getGridDim() const {
-  return _reader.getDataField< ::uint32_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-
-inline  ::uint32_t HookLauncher::LaunchKernelParams::Builder::getGridDim() {
-  return _builder.getDataField< ::uint32_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-inline void HookLauncher::LaunchKernelParams::Builder::setGridDim( ::uint32_t value) {
-  _builder.setDataField< ::uint32_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::uint32_t HookLauncher::LaunchKernelParams::Reader::getBlockDim() const {
-  return _reader.getDataField< ::uint32_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-
-inline  ::uint32_t HookLauncher::LaunchKernelParams::Builder::getBlockDim() {
-  return _builder.getDataField< ::uint32_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline void HookLauncher::LaunchKernelParams::Builder::setBlockDim( ::uint32_t value) {
-  _builder.setDataField< ::uint32_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::uint32_t HookLauncher::LaunchKernelParams::Reader::getSharedMem() const {
-  return _reader.getDataField< ::uint32_t>(
-      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
-}
-
-inline  ::uint32_t HookLauncher::LaunchKernelParams::Builder::getSharedMem() {
-  return _builder.getDataField< ::uint32_t>(
-      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
-}
-inline void HookLauncher::LaunchKernelParams::Builder::setSharedMem( ::uint32_t value) {
-  _builder.setDataField< ::uint32_t>(
-      ::capnp::bounded<2>() * ::capnp::ELEMENTS, value);
-}
-
-inline bool HookLauncher::LaunchKernelParams::Reader::hasParams() const {
-  return !_reader.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
-}
-inline bool HookLauncher::LaunchKernelParams::Builder::hasParams() {
-  return !_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::Data::Reader HookLauncher::LaunchKernelParams::Reader::getParams() const {
-  return ::capnp::_::PointerHelpers< ::capnp::Data>::get(_reader.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
-}
-inline  ::capnp::Data::Builder HookLauncher::LaunchKernelParams::Builder::getParams() {
-  return ::capnp::_::PointerHelpers< ::capnp::Data>::get(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
-}
-inline void HookLauncher::LaunchKernelParams::Builder::setParams( ::capnp::Data::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::Data>::set(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
-}
-inline  ::capnp::Data::Builder HookLauncher::LaunchKernelParams::Builder::initParams(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::Data>::init(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), size);
-}
-inline void HookLauncher::LaunchKernelParams::Builder::adoptParams(
-    ::capnp::Orphan< ::capnp::Data>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::Data>::adopt(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::Data> HookLauncher::LaunchKernelParams::Builder::disownParams() {
-  return ::capnp::_::PointerHelpers< ::capnp::Data>::disown(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
-}
-
-inline  ::ErrorCode HookLauncher::LaunchKernelResults::Reader::getError() const {
-  return _reader.getDataField< ::ErrorCode>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-
-inline  ::ErrorCode HookLauncher::LaunchKernelResults::Builder::getError() {
-  return _builder.getDataField< ::ErrorCode>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-inline void HookLauncher::LaunchKernelResults::Builder::setError( ::ErrorCode value) {
-  _builder.setDataField< ::ErrorCode>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
-}
-
 inline bool HookLauncher::GetNodeStatusResults::Reader::hasNodes() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
@@ -2183,6 +2112,300 @@ inline void HookLauncher::GetNodeStatusResults::Builder::adoptNodes(
 inline ::capnp::Orphan< ::capnp::List< ::NodeStatus,  ::capnp::Kind::STRUCT>> HookLauncher::GetNodeStatusResults::Builder::disownNodes() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::NodeStatus,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+
+inline bool HookLauncher::PrefetchDataParams::Reader::hasHandle() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline bool HookLauncher::PrefetchDataParams::Builder::hasHandle() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline  ::MemoryHandle::Reader HookLauncher::PrefetchDataParams::Reader::getHandle() const {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline  ::MemoryHandle::Builder HookLauncher::PrefetchDataParams::Builder::getHandle() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+#if !CAPNP_LITE
+inline  ::MemoryHandle::Pipeline HookLauncher::PrefetchDataParams::Pipeline::getHandle() {
+  return  ::MemoryHandle::Pipeline(_typeless.getPointerField(0));
+}
+#endif  // !CAPNP_LITE
+inline void HookLauncher::PrefetchDataParams::Builder::setHandle( ::MemoryHandle::Reader value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::MemoryHandle::Builder HookLauncher::PrefetchDataParams::Builder::initHandle() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::init(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline void HookLauncher::PrefetchDataParams::Builder::adoptHandle(
+    ::capnp::Orphan< ::MemoryHandle>&& value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::MemoryHandle> HookLauncher::PrefetchDataParams::Builder::disownHandle() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+
+inline bool HookLauncher::PrefetchDataResults::Reader::hasAck() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline bool HookLauncher::PrefetchDataResults::Builder::hasAck() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline  ::Ack::Reader HookLauncher::PrefetchDataResults::Reader::getAck() const {
+  return ::capnp::_::PointerHelpers< ::Ack>::get(_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline  ::Ack::Builder HookLauncher::PrefetchDataResults::Builder::getAck() {
+  return ::capnp::_::PointerHelpers< ::Ack>::get(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+#if !CAPNP_LITE
+inline  ::Ack::Pipeline HookLauncher::PrefetchDataResults::Pipeline::getAck() {
+  return  ::Ack::Pipeline(_typeless.getPointerField(0));
+}
+#endif  // !CAPNP_LITE
+inline void HookLauncher::PrefetchDataResults::Builder::setAck( ::Ack::Reader value) {
+  ::capnp::_::PointerHelpers< ::Ack>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::Ack::Builder HookLauncher::PrefetchDataResults::Builder::initAck() {
+  return ::capnp::_::PointerHelpers< ::Ack>::init(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline void HookLauncher::PrefetchDataResults::Builder::adoptAck(
+    ::capnp::Orphan< ::Ack>&& value) {
+  ::capnp::_::PointerHelpers< ::Ack>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::Ack> HookLauncher::PrefetchDataResults::Builder::disownAck() {
+  return ::capnp::_::PointerHelpers< ::Ack>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+
+inline bool HookLauncher::MeasureBandwidthParams::Reader::hasSrc() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline bool HookLauncher::MeasureBandwidthParams::Builder::hasSrc() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader HookLauncher::MeasureBandwidthParams::Reader::getSrc() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder HookLauncher::MeasureBandwidthParams::Builder::getSrc() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline void HookLauncher::MeasureBandwidthParams::Builder::setSrc( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder HookLauncher::MeasureBandwidthParams::Builder::initSrc(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), size);
+}
+inline void HookLauncher::MeasureBandwidthParams::Builder::adoptSrc(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> HookLauncher::MeasureBandwidthParams::Builder::disownSrc() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+
+inline bool HookLauncher::MeasureBandwidthParams::Reader::hasDst() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+}
+inline bool HookLauncher::MeasureBandwidthParams::Builder::hasDst() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader HookLauncher::MeasureBandwidthParams::Reader::getDst() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder HookLauncher::MeasureBandwidthParams::Builder::getDst() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+inline void HookLauncher::MeasureBandwidthParams::Builder::setDst( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder HookLauncher::MeasureBandwidthParams::Builder::initDst(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), size);
+}
+inline void HookLauncher::MeasureBandwidthParams::Builder::adoptDst(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> HookLauncher::MeasureBandwidthParams::Builder::disownDst() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+
+inline bool HookLauncher::MeasureBandwidthResults::Reader::hasResult() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline bool HookLauncher::MeasureBandwidthResults::Builder::hasResult() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline  ::BandwidthResult::Reader HookLauncher::MeasureBandwidthResults::Reader::getResult() const {
+  return ::capnp::_::PointerHelpers< ::BandwidthResult>::get(_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline  ::BandwidthResult::Builder HookLauncher::MeasureBandwidthResults::Builder::getResult() {
+  return ::capnp::_::PointerHelpers< ::BandwidthResult>::get(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+#if !CAPNP_LITE
+inline  ::BandwidthResult::Pipeline HookLauncher::MeasureBandwidthResults::Pipeline::getResult() {
+  return  ::BandwidthResult::Pipeline(_typeless.getPointerField(0));
+}
+#endif  // !CAPNP_LITE
+inline void HookLauncher::MeasureBandwidthResults::Builder::setResult( ::BandwidthResult::Reader value) {
+  ::capnp::_::PointerHelpers< ::BandwidthResult>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::BandwidthResult::Builder HookLauncher::MeasureBandwidthResults::Builder::initResult() {
+  return ::capnp::_::PointerHelpers< ::BandwidthResult>::init(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline void HookLauncher::MeasureBandwidthResults::Builder::adoptResult(
+    ::capnp::Orphan< ::BandwidthResult>&& value) {
+  ::capnp::_::PointerHelpers< ::BandwidthResult>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::BandwidthResult> HookLauncher::MeasureBandwidthResults::Builder::disownResult() {
+  return ::capnp::_::PointerHelpers< ::BandwidthResult>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+
+inline  ::uint64_t HookLauncher::TrackAsyncTaskParams::Reader::getTaskId() const {
+  return _reader.getDataField< ::uint64_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint64_t HookLauncher::TrackAsyncTaskParams::Builder::getTaskId() {
+  return _builder.getDataField< ::uint64_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+inline void HookLauncher::TrackAsyncTaskParams::Builder::setTaskId( ::uint64_t value) {
+  _builder.setDataField< ::uint64_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool HookLauncher::TrackAsyncTaskResults::Reader::hasStatus() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline bool HookLauncher::TrackAsyncTaskResults::Builder::hasStatus() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline  ::TaskStatus::Reader HookLauncher::TrackAsyncTaskResults::Reader::getStatus() const {
+  return ::capnp::_::PointerHelpers< ::TaskStatus>::get(_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline  ::TaskStatus::Builder HookLauncher::TrackAsyncTaskResults::Builder::getStatus() {
+  return ::capnp::_::PointerHelpers< ::TaskStatus>::get(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+#if !CAPNP_LITE
+inline  ::TaskStatus::Pipeline HookLauncher::TrackAsyncTaskResults::Pipeline::getStatus() {
+  return  ::TaskStatus::Pipeline(_typeless.getPointerField(0));
+}
+#endif  // !CAPNP_LITE
+inline void HookLauncher::TrackAsyncTaskResults::Builder::setStatus( ::TaskStatus::Reader value) {
+  ::capnp::_::PointerHelpers< ::TaskStatus>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::TaskStatus::Builder HookLauncher::TrackAsyncTaskResults::Builder::initStatus() {
+  return ::capnp::_::PointerHelpers< ::TaskStatus>::init(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline void HookLauncher::TrackAsyncTaskResults::Builder::adoptStatus(
+    ::capnp::Orphan< ::TaskStatus>&& value) {
+  ::capnp::_::PointerHelpers< ::TaskStatus>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::TaskStatus> HookLauncher::TrackAsyncTaskResults::Builder::disownStatus() {
+  return ::capnp::_::PointerHelpers< ::TaskStatus>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+
+inline float BandwidthResult::Reader::getThroughput() const {
+  return _reader.getDataField<float>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+
+inline float BandwidthResult::Builder::getThroughput() {
+  return _builder.getDataField<float>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+inline void BandwidthResult::Builder::setThroughput(float value) {
+  _builder.setDataField<float>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+}
+
+inline float BandwidthResult::Reader::getLatency() const {
+  return _reader.getDataField<float>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+
+inline float BandwidthResult::Builder::getLatency() {
+  return _builder.getDataField<float>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+inline void BandwidthResult::Builder::setLatency(float value) {
+  _builder.setDataField<float>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::uint8_t TaskStatus::Reader::getProgress() const {
+  return _reader.getDataField< ::uint8_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint8_t TaskStatus::Builder::getProgress() {
+  return _builder.getDataField< ::uint8_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+inline void TaskStatus::Builder::setProgress( ::uint8_t value) {
+  _builder.setDataField< ::uint8_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::uint32_t TaskStatus::Reader::getEstimatedTime() const {
+  return _reader.getDataField< ::uint32_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint32_t TaskStatus::Builder::getEstimatedTime() {
+  return _builder.getDataField< ::uint32_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+inline void TaskStatus::Builder::setEstimatedTime( ::uint32_t value) {
+  _builder.setDataField< ::uint32_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
 }
 
 

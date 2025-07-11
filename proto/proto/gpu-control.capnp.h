@@ -34,7 +34,7 @@ CAPNP_DECLARE_SCHEMA(a43a7ddd2d9aa498);
 enum class PathType_a43a7ddd2d9aa498: uint16_t {
   NVLINK,
   XBUS,
-  ROCE,
+  NETWORK,
 };
 CAPNP_DECLARE_ENUM(PathType, a43a7ddd2d9aa498);
 CAPNP_DECLARE_SCHEMA(a2673bfae409e7a5);
