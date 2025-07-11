@@ -27,17 +27,23 @@ import (
 	"ggithub.com/hiicl/GPU-over-IP-AC922/proto/proto"            // 协议定义
 )
 
-// CapnpServer 实现Cap'n Proto GPU服务
+// CapnpServer 实现Cap'n Proto GPU服务和协调服务
 type CapnpServer struct {
-    gpuStore  *gpu.GPUStore
-    scheduler *gpu.Scheduler
-    log       *logrus.Logger
-    funcCache map[uint64]cuda.Function // CUDA函数缓存
-    modCache  map[string]cuda.Module  // 模块缓存
-    funcMeta  map[uint64]string       // 函数元数据缓存（句柄->函数名）
-    paramPool *sync.Pool             // 参数缓冲区池
-    msgPool   *sync.Pool             // ZMQ消息缓冲池
-    cacheLock sync.RWMutex          // 缓存访问锁
+    gpuStore      *gpu.GPUStore
+    scheduler     *gpu.Scheduler
+    log           *logrus.Logger
+    funcCache     map[uint64]cuda.Function // CUDA函数缓存
+    modCache      map[string]cuda.Module  // 模块缓存
+    funcMeta      map[uint64]string       // 函数元数据缓存
+    paramPool     *sync.Pool             // 参数缓冲区池
+    msgPool       *sync.Pool             // ZMQ消息缓冲池
+    cacheLock     sync.RWMutex          // 缓存访问锁
+    
+    // HookLauncher协调服务组件
+    nodeStatus    map[string]gpu.NodeStatus // 节点状态存储
+    prefetchCache *lru.Cache              // 预取缓存
+    statusLock    sync.RWMutex           // 状态访问锁
+    zmqPubSocket  *zmq4.Socket           // ZMQ状态发布套接字
 }
 
 // 实现GPUService接口
@@ -129,7 +135,7 @@ func NewCapnpServer() *CapnpServer {
 	}
 	log.Infof("Discovered %d NUMA nodes", len(nodes))
 	
-	// 记录OpenCAPI设备信息（不修改绑定）
+	// 记录OpenCAPI设备信息
 	for _, node := range nodes {
 		for _, dev := range node.OpenCapi {
 			log.Infof("Found OpenCAPI device: %s (AFU: %s) on node %d, memory: %d MB", 
@@ -137,11 +143,7 @@ func NewCapnpServer() *CapnpServer {
 		}
 	}
 	
-	// NUMA绑定由容器运行时处理
-	// 注意: 资源管理器节点隔离已通过容器级NUMA绑定实现
-	
 	gpuStore := gpu.NewGPUStore()
-	// 容器级NUMA绑定已确保只包含本节点资源
 	scheduler := gpu.NewScheduler(gpuStore)
 	
 	// 初始化CUDA驱动
@@ -154,26 +156,48 @@ func NewCapnpServer() *CapnpServer {
 	// 初始化参数缓冲区池
 	paramPool := &sync.Pool{
 		New: func() interface{} {
-			return make([]byte, 0, 1024) // 初始容量1KB
+			return make([]byte, 0, 1024)
 		},
 	}
 	
 	// 初始化消息缓冲池
 	msgPool := &sync.Pool{
 		New: func() interface{} {
-			return make([]byte, 0, 4096) // 初始容量4KB
+			return make([]byte, 0, 4096)
 		},
 	}
 	
+	// 初始化预取缓存 (LRU, 最大100个条目)
+	prefetchCache, err := lru.New(100)
+	if err != nil {
+		log.Fatalf("Failed to create prefetch cache: %v", err)
+	}
+	
+	// 创建ZMQ PUB套接字用于状态广播
+	zmqCtx, err := zmq4.NewContext()
+	if err != nil {
+		log.Fatalf("Failed to create ZMQ context: %v", err)
+	}
+	pubSocket, err := zmqCtx.NewSocket(zmq4.PUB)
+	if err != nil {
+		log.Fatalf("Failed to create PUB socket: %v", err)
+	}
+	if err := pubSocket.Bind("tcp://*:5556"); err != nil {
+		log.Fatalf("Failed to bind PUB socket: %v", err)
+	}
+	
 	return &CapnpServer{
-		gpuStore:  gpuStore,
-		scheduler: scheduler,
-		log:       log,
-		funcCache: make(map[uint64]cuda.Function),
-		modCache:  make(map[string]cuda.Module),
-		funcMeta:  make(map[uint64]string),
-		paramPool: paramPool,
-		msgPool:   msgPool,
+		gpuStore:     gpuStore,
+		scheduler:    scheduler,
+		log:          log,
+		funcCache:    make(map[uint64]cuda.Function),
+		modCache:     make(map[string]cuda.Module),
+		funcMeta:     make(map[uint64]string),
+		paramPool:    paramPool,
+		msgPool:      msgPool,
+		nodeStatus:   make(map[string]gpu.NodeStatus),
+		prefetchCache: prefetchCache,
+		zmqPubSocket: pubSocket,
 	}
 }
 
@@ -488,6 +512,122 @@ func (s *CapnpServer) getCudaFunction(req proto.KernelLaunch) (cuda.Function, er
 
 // Cap'n Proto 接口方法
 
+func (s *CapnpServer) StartStatusMonitor() {
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
+	
+	for range ticker.C {
+		s.statusLock.Lock()
+		// 更新所有节点状态
+		for uuid := range s.nodeStatus {
+			status := s.gpuStore.GetStatus(uuid)
+			s.nodeStatus[uuid] = status
+			
+			// 通过ZMQ发布状态更新
+			statusData, err := json.Marshal(status)
+			if err != nil {
+				s.log.Errorf("Failed to marshal status: %v", err)
+				continue
+			}
+			if _, err := s.zmqPubSocket.Send("status", zmq4.SNDMORE); err != nil {
+				s.log.Errorf("Failed to send status topic: %v", err)
+				continue
+			}
+			if _, err := s.zmqPubSocket.SendBytes(statusData, 0); err != nil {
+				s.log.Errorf("Failed to send status data: %v", err)
+			}
+		}
+		s.statusLock.Unlock()
+	}
+}
+
+// 实现HookLauncher接口
+func (s *CapnpServer) PlanMemcpyHtoD(ctx context.Context, call proto.HookLauncher_planMemcpyHtoD) error {
+	req, err := call.Params()
+	if err != nil {
+		return err
+	}
+	
+	// 1. 选择最优节点
+	targetNode := s.selectOptimalNode(req.Size())
+	
+	// 2. 协商传输参数
+	port, err := s.negotiateTransferParams(targetNode, req.Size())
+	if err != nil {
+		return err
+	}
+	
+	// 3. 构建响应
+	res, err := call.AllocResults()
+	if err != nil {
+		return err
+	}
+	res.SetNodeId(targetNode)
+	res.SetPort(port)
+	res.SetUseUdp(true) // 使用UDP传输
+	
+	return nil
+}
+
+func (s *CapnpServer) PrefetchData(ctx context.Context, call proto.HookLauncher_prefetchData) error {
+	req, err := call.Params()
+	if err != nil {
+		return err
+	}
+	
+	// 1. 获取数据标识符
+	dataId := req.DataId()
+	
+	// 2. 检查缓存
+	if s.prefetchCache.Contains(dataId) {
+		return nil // 已在缓存中
+	}
+	
+	// 3. 触发预取
+	go s.fetchDataToCache(dataId, req.Size())
+	
+	return nil
+}
+
+// Helper: 选择最优节点
+func (s *CapnpServer) selectOptimalNode(size uint64) string {
+	// 简单实现：选择可用内存最多的节点
+	var maxMemory uint64
+	var selectedNode string
+	
+	s.statusLock.RLock()
+	defer s.statusLock.RUnlock()
+	
+	for nodeId, status := range s.nodeStatus {
+		if status.AvailableMemory > maxMemory {
+			maxMemory = status.AvailableMemory
+			selectedNode = nodeId
+		}
+	}
+	return selectedNode
+}
+
+// Helper: 协商传输参数
+func (s *CapnpServer) negotiateTransferParams(nodeId string, size uint64) (uint16, error) {
+	// 1. 计算分片大小（基于MTU）
+	mtu := 1500 // 标准以太网MTU
+	payloadSize := uint64(mtu - 40) // 减去IP+UDP头
+	
+	// 2. 分配UDP端口
+	port, err := s.allocateUdpPort()
+	if err != nil {
+		return 0, err
+	}
+	
+	// 3. 通知目标节点准备接收
+	if err := s.notifyNodeForTransfer(nodeId, port, size, payloadSize); err != nil {
+		return 0, err
+	}
+	
+	return port, nil
+}
+
+// ======== 在main函数中添加服务 ========
 func main() {
 	dataPort := flag.String("dataPort", "5555", "ZMQ data port")
 	routeFile := flag.String("routeFile", "config/numa_routes.json", "NUMA路由表文件")
@@ -517,6 +657,7 @@ func main() {
 
 	server := NewCapnpServer()
 	go server.StartZMQReceiver(*dataPort)
+	go server.StartStatusMonitor() // 启动状态监控
 	
 	// 启动ZMQ接收器
 	ctx, cancel := context.WithCancel(context.Background())
@@ -575,18 +716,64 @@ func loadRoutes(filename string) (map[int]string, error) {
 			}
 
 			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				transport := rpc.NewStreamTransport(conn)
-				defer transport.Close()
+		go func() {
+			defer wg.Done()
+			transport := rpc.NewStreamTransport(conn)
+			defer transport.Close()
 
-				main := gpu.GPUService_ServerToClient(server)
-				conn := rpc.NewConn(transport, &rpc.Options{BootstrapClient: capnp.Client(main)})
-				defer conn.Close()
+			// 提供多服务引导
+			boot := &MultiBootstrap{
+				gpuService: gpu.GPUService_ServerToClient(server),
+				hookLauncher: proto.HookLauncher_ServerToClient(server),
+			}
+			
+			conn := rpc.NewConn(transport, &rpc.Options{
+				BootstrapClient: capnp.Client(boot),
+			})
+			defer conn.Close()
 
-				<-conn.Done()
-			}()
-		}
+			<-conn.Done()
+		}()
+// MultiBootstrap 提供多服务引导
+type MultiBootstrap struct {
+	gpuService    gpu.GPUService
+	hookLauncher  proto.HookLauncher
+}
+
+func (b *MultiBootstrap) Bootstrap(ctx context.Context) capnp.Client {
+	// 返回一个提供多个接口的客户端
+	return capnp.Client(server.MainInterface{Server: b})
+}
+
+// MainInterface 实现多接口服务
+type MainInterface struct {
+	Server *MultiBootstrap
+}
+
+func (m MainInterface) Client() capnp.Client {
+	return capnp.Client(m)
+}
+
+func (m MainInterface) GetService(ctx context.Context, p service_discovery.GetServiceParams) (service_discovery.GetServiceResults, error) {
+	// 根据请求的服务名返回不同的服务
+	serviceName, err := p.ServiceName()
+	if err != nil {
+		return service_discovery.GetServiceResults{}, err
+	}
+	
+	switch serviceName {
+	case "gpu.GPUService":
+		return service_discovery.GetServiceResults{
+			Service: capnp.Client(m.Server.gpuService),
+		}, nil
+	case "hook.HookLauncher":
+		return service_discovery.GetServiceResults{
+			Service: capnp.Client(m.Server.hookLauncher),
+		}, nil
+	default:
+		return service_discovery.GetServiceResults{}, fmt.Errorf("unknown service: %s", serviceName)
+	}
+}
 	}()
 
 	<-sig
