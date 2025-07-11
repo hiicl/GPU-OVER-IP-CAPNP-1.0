@@ -12,8 +12,9 @@ import (
 )
 
 // StartContainers 启动NUMA节点容器集群
-// cfg: CLI配置参数
-func StartContainers(cfg config.CLIConfig) error {
+// cfg: 全局CLI配置
+// nodeConfigs: NUMA节点配置映射
+func StartContainers(cfg config.CLIConfig, nodeConfigs map[int]config.NUMAPconfig) error {
 	numaDirs, err := filepath.Glob("/var/lib/aitherion-cli/topology/numa[0-9]*_gpus.txt")
 	if err != nil || len(numaDirs) == 0 {
 		return fmt.Errorf("无法读取 NUMA 拓扑文件: %v", err)
@@ -109,10 +110,24 @@ if ifaceBytes, err := os.ReadFile(ifacePath); err == nil {
 
 image := fmt.Sprintf("%s:%s", cfg.ImageName, cfg.Tag)
 // 添加数据面接口参数
+		// 获取节点特定配置
+		nodeCfg, exists := nodeConfigs[i]
+		if !exists {
+			fmt.Printf("[!] NUMA %d 配置缺失，使用默认值\n", i)
+			nodeCfg = config.NUMAPconfig{
+				MemPercent: 80,
+				VmemRatio: 0.8,
+				ControlIface: "eth0",
+				DataIface: "eth1",
+			}
+		}
+
+		// 添加节点特定参数
 		args = append(args, "./capnpserver")
 		args = append(args, "--port", strconv.Itoa(capnpPort))
 		args = append(args, "--zmq-port", strconv.Itoa(cfg.ZmqBasePort))
-		args = append(args, "--data-iface", cfg.DataIface) // 使用配置的数据面网卡
+		args = append(args, "--control-iface", nodeCfg.ControlIface)
+		args = append(args, "--data-iface", nodeCfg.DataIface)
 args = append(args, image)
 
 		cmdLine := "docker " + strings.Join(args, " ")
@@ -152,4 +167,27 @@ func getNUMATotalMemoryKB(meminfoPath string) int {
 		}
 	}
 	return 0
+}
+
+// CheckContainerHealth 检查容器健康状态
+func CheckContainerHealth(containerName string) error {
+	// 检查容器是否正在运行
+	cmd := exec.Command("docker", "inspect", "-f", "{{.State.Running}}", containerName)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("检查容器运行状态失败: %v", err)
+	}
+
+	if strings.TrimSpace(string(output)) != "true" {
+		return errors.New("容器未运行")
+	}
+
+	// 检查OpenCAPI设备状态
+	cmd = exec.Command("docker", "exec", containerName, "numa-tool", "check-ocxl-health")
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("OpenCAPI设备检查失败: %v\n输出: %s", err, string(output))
+	}
+
+	return nil
 }

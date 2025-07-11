@@ -19,9 +19,9 @@ enum ErrorCode {
 }
 
 struct MemoryHandle {
-    localPtr @0 :UInt64;    # 客户端虚拟指针
-    remoteHandle @1 :UInt64; # 服务端物理句柄
-    nodeId @2 :UInt32;       # 所在节点ID
+    id @0 :UInt64;   # 全局唯一资源ID
+    size @1 :UInt64; # 内存大小(字节)
+    nodeId @2 :UInt32; # 所在节点ID
 }
 
 enum TransferDirection {
@@ -29,3 +29,14 @@ enum TransferDirection {
     dtoh @1;  # 设备到主机
     dtod @2;  # 设备到设备
 }
+
+struct Ack {
+    success @0 :Bool = false;
+    errorCode @1 :ErrorCode;
+    message @2 :Text;
+} # 错误响应结构
+
+struct Result {
+    success @0 :Bool = true;
+    data @1 :Data;  # 实际返回数据
+} # 成功响应结构

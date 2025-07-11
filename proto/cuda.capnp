@@ -1,12 +1,14 @@
 @0xbbbbcccc22224444;
-
-using Common = import "common.capnp";
-using Kernel = import "kernel.capnp";
-
-struct CudaMemInfo {
-    handle @0 :Common.MemoryHandle;
-    size @1 :UInt64;
-}
+# @file cuda.capnp
+# @brief 提供单设备CUDA操作接口
+# 
+# 职责范围：
+# - 显存管理（分配/释放/复制）
+# - CUDA流和事件管理
+# - 内核启动与执行
+# - 多GPU协作
+using Common = import "common.capnp"; # 基础类型定义
+using Kernel = import "kernel.capnp"; # 内核操作定义
 
 struct MemcpyParams {
     src @0 :Common.MemoryHandle;
@@ -43,10 +45,13 @@ struct MultiGpuRequest {
 }
 
 interface CudaService {
-    cudaInit @0 () -> (ack :Common.Ack);
-    cudaMemAlloc @1 (size :UInt64) -> (result :CudaMemInfo);
-    cudaMemcpy @2 (params :MemcpyParams) -> (ack :Common.Ack);
-    cudaMemFree @3 (handle :Common.MemoryHandle) -> (ack :Common.Ack);
+    cudaInit @0 () -> (ack :Common.Ack); # 初始化CUDA环境
+    
+    cudaMemAlloc @1 (size :UInt64) -> (result :Common.Result); # 分配显存
+    
+    cudaMemcpy @2 (params :MemcpyParams) -> (ack :Common.Ack); # 执行内存复制
+    
+    cudaMemFree @3 (handle :Common.MemoryHandle) -> (ack :Common.Ack); # 释放显存
 
     createCudaStream @4 (params :StreamCreateParams) -> (handle :StreamHandle);
     destroyCudaStream @5 (handle :StreamHandle) -> (ack :Common.Ack);
@@ -61,4 +66,6 @@ interface CudaService {
 
     batchKernelLaunch @12 (request :BatchKernelLaunch) -> (ack :Common.Ack);
     multiGpuCooperation @13 (request :MultiGpuRequest) -> (ack :Common.Ack);
+    
+    allocAndWrite @14 (size :UInt64, data :Data) -> (result :Common.Result); # 分配显存并写入数据
 }

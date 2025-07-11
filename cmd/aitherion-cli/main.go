@@ -87,6 +87,9 @@ func main() {
 			Short: "NUMA节点管理",
 		}
 		numaCmd.AddCommand(numa.HealthCmd)
+		numaCmd.AddCommand(numa.DiscoverCmd)
+		numaCmd.AddCommand(numa.ConfigureCmd)
+		numaCmd.AddCommand(numa.StartCmd)
 		rootCmd.AddCommand(numaCmd)
 		
 		// 添加容器管理子命令

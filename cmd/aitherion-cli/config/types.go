@@ -37,6 +37,14 @@ type CLIConfig struct {
     MacvlanMode    string            // macvlan模式: bridge/vepa/passthru
 }
 
+// NUMAPconfig 存储NUMA节点配置
+type NUMAPconfig struct {
+	MemPercent   float64
+	VmemRatio    float64
+	ControlIface string
+	DataIface    string
+}
+
 // 默认值（也可扩展 defaults.go 加载）
 func DefaultCLIConfig() CLIConfig {
     return CLIConfig{
