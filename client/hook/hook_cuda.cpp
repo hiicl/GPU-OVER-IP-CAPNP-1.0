@@ -115,14 +115,7 @@ void StatusMonitorThread() {
 }
 
 // Hooked_cuMemAlloc: 拦截内存分配请求
-// 将内存分配请求转发到远程GPU节点
-// 参数：
-//   dev_ptr - 返回的设备指针
-//   byte_size - 分配的内存大小
-// 返回值：CUDA错误码
 CUresult CUDAAPI Hooked_cuMemAlloc(CUdeviceptr* dev_ptr, size_t byte_size) {
-    std::lock_guard<std::mutex> lock(g_api_mutex);
-    if (!g_launcher_client || !g_launcher_client->isConnected())
     std::lock_guard<std::mutex> lock(g_api_mutex);
     if (!g_launcher_client || !g_launcher_client->isConnected())
         return CUDA_ERROR_NOT_INITIALIZED;
@@ -143,11 +136,18 @@ CUresult CUDAAPI Hooked_cuMemAlloc(CUdeviceptr* dev_ptr, size_t byte_size) {
               << ", remoteHandle: " << handle.remoteHandle
               << ", nodeId: " << handle.nodeId << std::endl;
     
-    std::cout << "[Hook] Allocated " << byte_size << " bytes, fakePtr: 0x" 
-              << std::hex << result.fakePtr << std::dec << std::endl;
+    // 触发预取优化
+    g_launcher_client->prefetchData(handle.remoteHandle, byte_size);
     
     return CUDA_SUCCESS;
 }
+
+// Hooked_cuMemAlloc: 拦截内存分配请求
+// 将内存分配请求转发到远程GPU节点
+// 参数：
+//   dev_ptr - 返回的设备指针
+//   byte_size - 分配的内存大小
+// 返回值：CUDA错误码
 
 // Hooked_cuMemFree: 拦截内存释放请求
 // 将内存释放请求转发到远程GPU节点
@@ -195,22 +195,42 @@ CUresult CUDAAPI Hooked_cuMemcpyHtoD(CUdeviceptr dstDevice, const void* srcHost,
     if (!handle) {
         return pOriginal_cuMemcpyHtoD(dstDevice, srcHost, ByteCount);
     }
-    
-    // 创建传输参数
-    MemcpyParams params;
-    params.setDstPtr(reinterpret_cast<uint64_t>(dstDevice));
-    params.setSrcPtr(reinterpret_cast<uint64_t>(srcHost));
-    params.setSize(ByteCount);
-    params.setKind(static_cast<uint32_t>(cudaMemcpyHostToDevice));
-    
-    // 执行数据传输
-    auto result = g_launcher_client->requestMemcpyV2(params);
-    if (result != CUDA_SUCCESS) {
-        std::cerr << "[Hook] HtoD transfer failed: " << result << std::endl;
+
+    // 小数据传输直接使用RPC
+    if (ByteCount < 1024) {
+        MemcpyParams params;
+        params.setDstPtr(reinterpret_cast<uint64_t>(dstDevice));
+        params.setSrcPtr(reinterpret_cast<uint64_t>(srcHost));
+        params.setSize(ByteCount);
+        params.setKind(static_cast<uint32_t>(cudaMemcpyHostToDevice));
+        
+        auto result = g_launcher_client->requestMemcpyV2(params);
+        if (result != CUDA_SUCCESS) {
+            std::cerr << "[Hook] HtoD RPC transfer failed: " << result << std::endl;
+            return CUDA_ERROR_UNKNOWN;
+        }
+        return CUDA_SUCCESS;
+    }
+
+    // 大数据传输使用规划服务
+    auto plan = g_launcher_client->requestPlanMemcpyHtoD(ByteCount);
+    if (!plan.success) {
+        std::cerr << "[Hook] PlanMemcpyHtoD failed" << std::endl;
         return CUDA_ERROR_UNKNOWN;
     }
+
+    // 使用UDP传输
+    if (plan.use_udp) {
+        if (g_zmq_manager->Transfer(plan.target_ip, plan.port, 
+                                    const_cast<void*>(srcHost), ByteCount)) {
+            return CUDA_SUCCESS;
+        } else {
+            std::cerr << "[Hook] UDP transfer failed" << std::endl;
+            return CUDA_ERROR_UNKNOWN;
+        }
+    }
     
-    return CUDA_SUCCESS;
+    return CUDA_ERROR_NOT_SUPPORTED;
 }
 
 // Hooked_cuMemcpyDtoH: 拦截设备到主机内存复制
@@ -265,7 +285,6 @@ CUresult CUDAAPI Hooked_cuLaunchKernel(
     if (!g_launcher_client || !g_launcher_client->isConnected())
         return CUDA_ERROR_LAUNCH_FAILED;
 
-    // 查找内核名称
     // 查找内核名称
     auto it = g_function_name_map.find(f);
     if (it == g_function_name_map.end()) {
