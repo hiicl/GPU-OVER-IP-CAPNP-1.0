@@ -64,6 +64,10 @@
 │       ├── cuda.capnp.h
 │       ├── gpu-control.capnp.c++
 │       ├── gpu-control.capnp.h
+│       ├── kernel.capnp.c++
+│       ├── kernel.capnp.h
+│       ├── memcopy.capnp.c++
+│       ├── memcopy.capnp.h
 │       ├── hook-launcher.capnp.c++
 │       └── hook-launcher.capnp.h
 └── go.mod                        # Go模块定义
