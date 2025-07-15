@@ -35,6 +35,9 @@ type CLIConfig struct {
     NUMANICMap     map[string]string // NUMA节点网卡映射 (格式: node0:eth0,node1:eth1)
     EnableMacvlan  bool              // 启用macvlan网络隔离
     MacvlanMode    string            // macvlan模式: bridge/vepa/passthru
+    
+    // RDMA 设备配置
+    RDMADevices   []RDMADevice       `yaml:"rdma_devices,omitempty"` // RDMA设备列表
 }
 
 // NUMAPconfig 存储NUMA节点配置
@@ -43,6 +46,22 @@ type NUMAPconfig struct {
 	VmemRatio    float64
 	ControlIface string
 	DataIface    string
+}
+
+// RDMADevice 存储RDMA设备配置
+type RDMADevice struct {
+	PCIAddress  string `yaml:"pci_address"`
+	Description string `yaml:"description"`
+	InterfaceName string `yaml:"interface_name"` // 添加网口名称字段
+	MacvlanBindings []MacvlanBinding `yaml:"macvlan_bindings,omitempty"`
+	NUMANodes []int `yaml:"numa_nodes,omitempty"` // 添加NUMA节点绑定字段
+}
+
+// MacvlanBinding 存储macvlan绑定配置
+type MacvlanBinding struct {
+	Container string `yaml:"container"`
+	Interface string `yaml:"interface"`
+	IP        string `yaml:"ip"`
 }
 
 // 默认值（也可扩展 defaults.go 加载）

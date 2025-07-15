@@ -21,7 +21,15 @@ var DiscoverCmd = &cobra.Command{
 		
 		fmt.Printf("检测到 %d 个NUMA节点:\n", len(nodes))
 		for i, node := range nodes {
-			fmt.Printf("NUMA%d: CPU核心数=%d, GPU数量=%d\n", i, node.CPUCores, len(node.GPUs))
+			fmt.Printf("NUMA%d: CPU核心数=%d, GPU数量=%d, 网卡数量=%d\n", 
+				i, node.CPUCores, len(node.GPUs), len(node.NetworkDevices))
+			
+			// 打印GPU-NUMA-网卡关系
+			fmt.Printf("  GPU设备: %v\n", node.GPUs)
+			fmt.Printf("  关联网卡: %v\n", node.NetworkDevices)
+			if len(node.RDMADevices) > 0 {
+				fmt.Printf("  RDMA设备: %v\n", node.RDMADevices)
+			}
 		}
 		
 		fmt.Println("NUMA拓扑检测完成")
