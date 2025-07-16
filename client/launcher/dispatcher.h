@@ -15,12 +15,12 @@ struct RemoteNode {
                std::string roce_interface, int priority,
                size_t total_memory, size_t available_memory,
                double network_latency, double cpu_usage, 
-               double gpu_utilization)
+    double gpu_utilization, int numaId)
         : id(std::move(id)), name(std::move(name)), address(std::move(address)),
           roce_interface(std::move(roce_interface)), priority(priority),
           total_memory(total_memory), available_memory(available_memory),
           network_latency(network_latency), cpu_usage(cpu_usage),
-          gpu_utilization(gpu_utilization) {}
+          gpu_utilization(gpu_utilization), numaId(numaId) {}
     
     std::string id;
     std::string name;
@@ -32,6 +32,7 @@ struct RemoteNode {
     double network_latency;
     double cpu_usage;
     double gpu_utilization;
+    int numaId;  // NUMA节点标识符
     uint16_t zmq_port;  // ZMQ数据传输端口
     std::unique_ptr<LauncherClient> launcher_client;  // 更新为新的客户端类型
 };

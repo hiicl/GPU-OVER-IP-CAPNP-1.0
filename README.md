@@ -2,58 +2,87 @@
 
 ## 架构定义
 
-- **节点 (Node)**: 指一台物理服务器
-- **NUMA**: 每个节点包含两个NUMA域（NUMA0和NUMA1）
-- **节点内通信**: 同一服务器内NUMA域间通信（通过X-Bus）
-- **跨节点NUMA-to-NUMA通信**: 服务器间通过ZMQ+UDP网络通信
-- **跨节点GPU-to-GPU通信**: 服务器间通过RDMA网络通信
+### 物理设备
+- **Server/Host**: IBM AC922物理服务器或运行Linux的主机
+- **Numa节点**: CPU + 本地内存 + 局部GPU接口的拓扑单元
+- **Numa地址**: 唯一标识符格式`serverId:numaId`
+
+### 通信路径
+| 路径类型 | 技术栈 | 描述 |
+|----------|--------|------|
+| GPU-to-GPU | ROCE + GPUDirect RDMA | GPU间跨服务器直接通信 |
+| Numa-to-Numa | UDP + ZMQ | Numa域间跨服务器通信 |
+| Server内Numa通信 | X-Bus | 同一服务器内Numa域间通信 |
+
+### 调度与数据管理
+- **调度单位**: Numa节点（所有资源调度基于Numa维度）
+- **热度管理**: 以Numa节点为数据所属单位统计访问热度
+- **位置标识**: 使用`serverId:numaId`格式唯一标识资源位置
 
 ## 目录树
 ```
 .
 ├── client
 │   ├── hook
-│   │   ├── context_manager.cpp   # CUDA上下文管理
-│   │   ├── context_manager.h
 │   │   ├── easyhook_entry.cpp    # EasyHook入口点
-│   │   ├── hook_cuda.cpp         # CUDA API拦截实现（新增NUMA本地内存优化）
+│   │   ├── hook_cuda.cpp         # CUDA API拦截实现
 │   │   ├── hook_cuda.def
 │   │   ├── hook_cuda.h
 │   │   ├── launcher_client.cpp   # Launcher客户端通信
 │   │   ├── launcher_client.h
 │   │   ├── pch.h                 # 预编译头文件
-│   │   ├── rdma_manager.cpp      # RDMA通信管理 (新增ROCE支持)
-│   │   ├── rdma_manager.h
-│   │   ├── zmq_manager.cpp       # ZMQ通信管理（新增CRC校验支持）
-│   │   └── zmq_manager.h
 │   └── launcher
 │       ├── dispatcher.cpp        # 请求分发器
 │       ├── dispatcher.h
 │       ├── main.cpp              # Launcher主入口
-│       └── protocol_adapter.cpp  # Cap'n Proto协议适配器 (新增RDMA支持)
+│       ├── memory
+│       │   ├── global_memory.cpp # 全局内存管理
+│       │   ├── global_memory.h
+│       │   └── numa_address.h    # Numa地址标识
+│       ├── protocol_adapter.cpp  # Cap'n Proto协议适配器
+│       └── transport
+│           ├── rdma_transport.cpp # RDMA传输实现
+│           ├── rdma_transport.h
+│           ├── zmq_transport.cpp # ZeroMQ传输实现
+│           └── zmq_transport.h
+│           ├── plank
+│           │   ├── plank_transport.cpp # 跳板传输实现
+│           │   └── plank_transport.h
+│       ├── services
+│           ├── advise_service.cpp   # 内存建议服务实现
+│           ├── advise_service.h
+│           ├── cooling_service.cpp  # 冷却服务实现
+│           ├── cooling_service.h
+│           ├── memory_service.cpp   # 内存服务实现
+│           ├── memory_service.h
+│           ├── transport_service.cpp # 传输服务实现
+│           └── transport_service.h
 ├── cmd
 │   ├── aitherion-cli
 │   │   ├── clean.go              # 资源清理工具
 │   │   ├── config
-│   │   │   └── types.go          # 配置类型定义 (新增RDMA设备配置)
+│   │   │   └── types.go          # 配置类型定义
 │   │   ├── init.go               # 初始化命令
 │   │   ├── main.go               # CLI主入口
 │   │   ├── numa
-│   │   │   ├── configure.go      # NUMA节点配置 (新增ROCE网卡管理)
-│   │   │   ├── discover.go       # NUMA拓扑发现
-│   │   │   ├── healthcmd.go      # NUMA健康检查
+│   │   │   ├── configure.go      # Numa节点配置
+│   │   │   ├── discover.go       # Numa拓扑发现
+│   │   │   ├── healthcmd.go      # Numa健康检查
 │   │   │   └── start.go          # 容器启动管理
 │   │   └── utils
-│   │       ├── docker.go         # Docker工具 (新增RDMA设备映射)
+│   │       ├── docker.go         # Docker工具
 │   │       ├── network.go        # 网络工具
 │   │       ├── resource.go       # 资源工具
 │   │       └── topogen.go        # 拓扑生成工具
 │   └── capnpserver
 │       └── main.go               # Cap'n Proto服务器
-├── config
-│   └── ac922_topology.yaml       # AC922拓扑配置
 ├── docker
 │   └── dockerfile.dockerfile     # Docker构建文件
+├── pkg
+│   └── numa
+│       ├── binding.go            # Numa设备绑定功能
+│       ├── discovery.go          # Numa拓扑发现
+│       └── opencapi.go           # OpenCAPI支持
 ├── proto
 │   ├── common.capnp              # 通用协议定义
 │   ├── cuda.capnp                # CUDA相关协议
@@ -81,143 +110,128 @@
 
 | 文件路径 | 功能描述 |
 |----------|----------|
-| `client/hook/hook_cuda.cpp` | CUDA API拦截实现，重定向GPU操作到远程节点（新增动态路径决策） |
-| `client/hook/rdma_manager.cpp` | RDMA通信管理，实现高性能内存传输 (新增ROCE支持) |
-| `client/hook/zmq_manager.cpp` | ZeroMQ通信管理，处理控制平面消息（新增CRC校验支持） |
-| `client/launcher/dispatcher.cpp` | 请求分发器（实现中心化策略引擎） |
-| `client/launcher/protocol_adapter.cpp` | Cap'n Proto协议适配器，转换消息格式 (新增RDMA内存复制函数) |
-| `cmd/aitherion-cli/numa/configure.go` | NUMA节点配置 (新增ROCE网卡管理菜单) |
-| `cmd/aitherion-cli/numa/discover.go` | NUMA拓扑发现（新增GPU-NUMA-网卡关系检测） |
-| `cmd/aitherion-cli/numa/start.go` | 容器生命周期管理，启动NUMA节点上的服务 |
-| `cmd/aitherion-cli/config/types.go` | 配置类型定义（新增动态路径策略类型） |
-| `cmd/aitherion-cli/utils/docker.go` | Docker工具 (新增RDMA设备映射支持，新增macvlan自动配置) |
-| `proto/hook-launcher.capnp` | Hook与Launcher间通信协议定义（新增动态路径决策接口） |
-| `proto/memcopy.capnp` | 内存复制操作协议定义 |
-| `docker/dockerfile.dockerfile` | 容器镜像构建配置 |
+| `client/hook/hook_cuda.cpp` | CUDA API拦截实现（基于服务层架构，含三维数据追踪+读写路径分离） |
+| `client/launcher/services/memory_service.cpp` | 内存分配/释放服务 |
+| `client/launcher/services/transport_service.cpp` | 数据传输服务（内存复制/内核启动） |
+| `client/launcher/services/advise_service.cpp` | 内存建议服务（预取/位置建议） |
+| `client/launcher/dispatcher.cpp` | 请求分发器（动态路径决策+显存稳定区管理+智能数据迁移） |
+| `client/launcher/transport/zmq_transport.cpp` | ZeroMQ UDP传输实现（带CRC校验） |
+| `client/launcher/transport/rdma_transport.cpp` | RDMA ROCE传输实现 |
+| `client/launcher/transport/plank/plank_transport.cpp` | 跳板传输实现（GDR-to-GDR） |
+| `client/launcher/services/cooling_service.cpp` | 数据热度监控服务 |
+| `pkg/numa/binding.go` | Numa设备绑定功能 |
+| `pkg/numa/discovery.go` | Numa拓扑发现 |
+| `cmd/aitherion-cli/numa/configure.go` | Numa节点配置 |
+| `proto/hook-launcher.capnp` | Hook与Launcher间通信协议 |
 
-## CLI使用手册
+## 关键功能实现验证
 
-### ROCE网卡管理
+### Numa路径管理
+1. **同一Numa NVLink**  
+   ✅ Linux自动管理 - 项目无需实现  
+2. **跨Numa X-Bus路径**  
+   ✅ 内存本地分配与自动迁移  
+3. **跨节点RDMA调度**  
+   ✅ 智能传输策略选择  
+   ✅ GDR-to-GDR传输支持  
+4. **动态路径决策**  
+   ✅ 基于拓扑的智能路由  
+   ✅ 读写路径分离机制  
+
+### 智能数据迁移特性
+1. **高频数据本地化**  
+   ✅ 频繁访问的远程数据自动迁移至GPU所在Numa  
+   ✅ 减少跨Numa访问延迟  
+2. **流动性感知迁移**  
+   ✅ 高流动性数据优先迁移到本地主机内存  
+   ✅ 迁移计数阈值触发自动优化  
+3. **双重阈值稳定区管理**  
+   | 阈值 | 操作 | 效果 |  
+   |------|------|------|  
+   | >85% 显存利用率 | 触发迁移机制 | 防止显存过载 |  
+   | <70% 显存利用率 | 扩展稳定区 | 优化资源利用率 |  
+
+### 服务化架构设计
+1. **服务层架构**  
+   ✅ 模块化服务设计（内存/传输/建议/冷却服务）  
+   ✅ 解耦核心功能便于扩展  
+2. **控制面Cap'n Proto**  
+   ✅ 所有RPC接口使用Cap'n Proto  
+3. **ZeroMQ UDP数据面**  
+   ✅ Numa绑定的网卡支持  
+   ✅ CRC校验保障可靠性  
+4. **RDMA独立设计**  
+   ✅ 专用ROCE通道  
+   ✅ 跨Numa优化支持  
+5. **跳板传输机制**  
+   ✅ GPU-CPU零拷贝  
+   ✅ GDR-to-GDR传输优化  
+6. **三维数据特性服务**  
+   ✅ **热度分析**：基于访问频率和时间衰减  
+   ✅ **流动性追踪**：记录跨Numa/节点迁移次数  
+   ✅ **稳定性评估**：结合地址生存周期和访问模式  
+   ✅ **显存稳定区**：自动管理高稳定性热数据  
+   ✅ **利用率阈值策略**：  
+     - >85%利用率触发迁移  
+     - <70%利用率扩展稳定区  
+   ✅ **温度指标**：实时监控数据访问热度  
+
+## 使用示例
+
 ```bash
+# Numa拓扑发现
+aitherion-cli numa discover
+
+# 配置Numa节点
 aitherion-cli numa configure
-```
 
-1. 选择`ROCE网卡管理`选项
-2. 功能菜单：
-   - `添加ROCE网口`：检测并添加支持ROCE/IB的网卡
-   - `配置macvlan`：为RDMA设备配置macvlan网络
-   - `绑定容器`：将RDMA设备绑定到指定容器
-   - `测试RDMA性能`：运行RDMA性能基准测试
-
-### NUMA节点配置示例
-```
-$ aitherion-cli numa configure
-
-=== NUMA配置菜单 ===
-[1] 配置NUMA0
-[2] 配置NUMA1
-[3] 执行start命令启动容器
-[4] ROCE网卡管理
-[5] 返回主菜单
-请选择操作: 1
-
-=== 配置NUMA0 ===
-当前设置:
-  内存百分比: 80.0%
-  显存占比: 0.8
-  控制面接口: eth0
-  数据面接口: eth1
-[1] 修改内存百分比
-[2] 修改显存占比
-[3] 修改网络接口
-[4] 保存并返回
-请选择操作: 3
-请输入控制面接口名称: enp1s0
-请输入数据面接口名称: enp2s0
-请选择操作: 4
-```
-
-### ROCE网卡配置示例
-```
-$ aitherion-cli numa configure
-
-=== NUMA配置菜单 ===
-[1] 配置NUMA0
-[2] 配置NUMA1
-[3] 执行start命令启动容器
-[4] ROCE网卡管理
-[5] 返回主菜单
-请选择操作: 4
-
-=== ROCE网卡管理 ===
-[1] 添加ROCE网口
-[2] 配置macvlan（自动创建macvlan接口和网络命名空间）
-[3] 绑定容器
-[4] 测试RDMA性能
-[5] 返回上级菜单
-请选择操作: 1
-
-正在检测支持ROCE/IB的网卡...
-检测到以下支持ROCE/IB的网卡：
-[1] 0000:17:00.0 Network controller: Mellanox Technologies MT28908 Family
-[2] 0000:d8:00.0 Ethernet controller: Mellanox Technologies MT28908 Family
-
-请选择要添加的网卡 (1-2): 1
-已添加网口: 0000:17:00.0
-选择绑定的NUMA节点 (可多选, 用逗号分隔):
-0: NUMA0
-1: NUMA1
-> 0,1
-绑定到NUMA节点: [0,1]
-已保存配置: {PCIAddress:0000:17:00.0 Description:Mellanox... NUMANodes:[0 1]}
-```
-
-### 容器启动示例
-```
-$ aitherion-cli numa start
-[Run] docker run -it --rm -d \
-    --runtime=nvidia \
-    -e NVIDIA_VISIBLE_DEVICES=0 \
-    -e CAPNP_PORT=50051 \
-    -e ZMQ_PORT=5555 \
-    -e CONTROL_IFACE=enp1s0 \
-    -e DATA_IFACE=enp2s0 \
-    -v /dev:/dev \
-    -p 50051:50051 \
-    -p 5555:5555/udp \
-    --device /dev/infiniband/mlx5_0 \
-    --network container:macvlan0 \
-    --name aitherion-cli-numa0 \
-    -e ENABLE_RDMA=true \
-    -e RDMA_DEVICES=mlx5_0 \
-    aitherion-runtime:latest ./capnpserver \
-    --port 50051 \
-    --zmq-port 5555 \
-    --control-iface enp1s0 \
-    --data-iface enp2s0
-
-[✓] 所有 NUMA 容器启动完成 (使用 Cap'n Proto 协议)
+# 启动服务
+aitherion-cli numa start
 ```
 
 ## 功能特性
 
-- **GPU虚拟化**：通过客户端Hook机制拦截CUDA调用，实现远程GPU调用
-- **内存扩展**：支持使用服务端内存作为显存扩展
-- **NUMA感知**：自动优化NUMA节点资源分配（新增本地内存优化）
-- **容器化部署**：一键启动服务端NUMA容器集群（新增macvlan自动配置）
-- **RDMA支持**：通过RoCE网卡实现GPUDirect RDMA加速
-- **可靠传输**：ZeroMQ UDP传输增加CRC校验（新增）
+- **服务化架构**：
+  - 内存服务：统一管理内存分配/释放
+  - 传输服务：处理数据传输和内核启动
+  - 建议服务：优化内存位置和预取策略
+  - 冷却服务：三维数据特性监控
+- **GPU虚拟化**：通过客户端Hook机制拦截CUDA调用
+- **Numa感知**：自动优化Numa节点资源分配
+- **容器化部署**：一键启动服务端容器集群
 - **双网络平面**：
-  - 控制面：1G管理口 + Cap'n Proto TCP
-  - 数据面：200G QSFP + ZMQ UDP（带CRC校验）和 RoCE RDMA
-- **动态路径决策**：基于NUMA拓扑和GPU位置智能选择传输路径
-- **中心化策略服务**：由统一管理内存分配和传输策略
+  - 控制面：Cap'n Proto TCP
+  - 数据面：ZeroMQ UDP + RDMA ROCE
+- **动态路径决策**：智能选择最优传输路径（NVLink/XBus/RDMA）
+- **三维数据特性管理**：
+  - 热度：实时监控访问频率
+  - 温度：量化数据访问热度
+  - 流动性：追踪跨节点迁移
+  - 稳定性：评估数据生存周期
+- **读写路径分离**：
+  - 读路径：GPUDirect RDMA（支持GDR-to-GDR）
+  - 写路径：ZMQ over UDP
+- **显存稳定区**：自动管理高稳定性热数据
+- **跳板传输机制**：高效处理GDR-to-GDR通信
+- **资源聚集**：自动优化内存布局
+- **智能数据迁移**：
+  - 高频数据本地化
+  - 流动性感知迁移
+  - 双重阈值稳定区管理
 
 ## 性能优化
-- **NUMA本地内存优化**：在服务端本地NUMA节点分配内存，减少跨节点访问延迟
-- **内存迁移机制**：自动迁移不在本地NUMA节点的内存数据
-- **UDP传输优化**：添加CRC校验减少重传，提高有效带宽
-- **RoCE网卡加速**：使用RDMA进行GPU数据传输
-- **NUMA节点绑定**：优化跨节点访问性能
-- **动态路径选择**：根据拓扑和负载自动选择最优路径（NVLink/XBus/RDMA）
-- **中心化策略引擎**：综合考虑内存、延迟、负载和优先级
+- **服务层优化**：
+  - 内存服务：Numa本地内存分配
+  - 传输服务：智能选择最优传输协议
+  - 建议服务：自动预取热点数据
+- **Numa本地内存优化**：减少跨节点访问延迟
+- **UDP传输优化**：CRC校验减少重传
+- **RoCE网卡加速**：GPU间直接RDMA传输
+- **动态路径选择**：实时优化传输路径
+- **三维数据特性优化**：
+  - 热数据本地化处理
+  - 冷数据跨节点传输
+- **Numa预取优化**：
+  - 跨Numa访问自动启用预取
+  - 本地内存优先分配
+- **跳板传输**：优化GDR-to-GDR通信延迟

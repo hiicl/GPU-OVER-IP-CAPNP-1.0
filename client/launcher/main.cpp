@@ -6,21 +6,35 @@
 #include <chrono>
 #include <capnp/ez-rpc.h>
 #include "dispatcher.h"
-#include "hook-launcher.capnp.h" // 更新为新的协议文件
+#include "hook-launcher.capnp.h"
+#include "services/memory_service.h"
+#include "services/transport_service.h"
+#include "services/advise_service.h"
+#include "services/cooling_service.h" // 用于AdviseService
+#include "transport_manager.h" // 用于TransportService
 
 namespace fs = std::filesystem;
 
-// HookLauncher接口实现
-class HookLauncherImpl final : public HookLauncher::Server {
+// 根服务聚合所有接口
+class RootService final : 
+    public HookLauncher::Server,
+    public GenericServices::Server {
 public:
-    HookLauncherImpl(Dispatcher& dispatcher) : dispatcher_(dispatcher) {}
+    RootService(
+        Dispatcher& dispatcher,
+        GlobalMemoryManager& memoryManager,
+        TransportManager& transportManager,
+        CoolingService& coolingService
+    ) : dispatcher_(dispatcher),
+        memoryService_(memoryManager),
+        transportService_(transportManager),
+        adviseService_(coolingService) {}
 
-    // 内存分配请求
+    // HookLauncher接口实现
     kj::Promise<void> requestAllocation(RequestAllocationContext context) override {
         auto size = context.getParams().getSize();
         
-        // 选择最佳节点
-        auto* node = dispatcher_.PickNode(size);
+        auto* node = dispatcher_.PickNode(0, size); // 使用0作为ptr占位符
         if (!node) {
             context.getResults().setResult(AllocationResult{
                 .fakePtr = 0,
@@ -29,8 +43,7 @@ public:
             return kj::READY_NOW;
         }
         
-        // 在远程节点分配内存
-        auto allocPromise = node->capnp_client->MemAlloc(size);
+        auto allocPromise = node->launcher_client->requestAllocation(size);
         return allocPromise.then([this, context, node](auto response) mutable {
             if (response.error != CUDA_SUCCESS) {
                 context.getResults().setResult(AllocationResult{
@@ -40,16 +53,14 @@ public:
                 return;
             }
             
-            // 创建内存映射
             uint64_t fakePtr = reinterpret_cast<uint64_t>(::operator new(1));
             RemoteAllocInfo allocInfo{
                 .node_id = node->id,
-                .size = size,
-                .remote_handle = response.ptr
+                .size = response.size,
+                .remote_handle = response.handle
             };
             dispatcher_.AddMapping(fakePtr, allocInfo);
             
-            // 返回分配结果
             context.getResults().setResult(AllocationResult{
                 .fakePtr = fakePtr,
                 .error = CUDA_SUCCESS
@@ -57,65 +68,77 @@ public:
         });
     }
 
-    // 内存释放请求
     kj::Promise<void> requestFree(RequestFreeContext context) override {
         auto fakePtr = context.getParams().getFakePtr();
         
-        // 获取内存映射信息
         auto* allocInfo = dispatcher_.GetMapping(fakePtr);
         if (!allocInfo) {
             context.getResults().setResult(CUDA_ERROR_INVALID_VALUE);
             return kj::READY_NOW;
         }
         
-        // 获取对应节点
         auto* node = dispatcher_.GetNodeById(allocInfo->node_id);
         if (!node) {
             context.getResults().setResult(CUDA_ERROR_INVALID_VALUE);
             return kj::READY_NOW;
         }
         
-        // 在远程节点释放内存
-        auto freePromise = node->capnp_client->MemFree(allocInfo->remote_handle);
+        auto freePromise = node->launcher_client->requestFree(allocInfo->remote_handle);
         return freePromise.then([this, context, fakePtr](auto error) mutable {
-            // 移除内存映射
             dispatcher_.RemoveMapping(fakePtr);
             ::operator delete(reinterpret_cast<void*>(fakePtr), 1);
             context.getResults().setResult(error);
         });
     }
 
-    // HtoD传输计划请求
     kj::Promise<void> planMemcpyHtoD(PlanMemcpyHtoDContext context) override {
+        // 保持原有实现不变
         auto dstFakePtr = context.getParams().getDstFakePtr();
         auto size = context.getParams().getSize();
         
-        // 获取内存映射信息
         auto* allocInfo = dispatcher_.GetMapping(dstFakePtr);
         if (!allocInfo) {
             context.getResults().initPlan().setError(CUDA_ERROR_INVALID_VALUE);
             return kj::READY_NOW;
         }
         
-        // 获取对应节点
         auto* node = dispatcher_.GetNodeById(allocInfo->node_id);
         if (!node) {
             context.getResults().initPlan().setError(CUDA_ERROR_INVALID_VALUE);
             return kj::READY_NOW;
         }
         
-        // 生成传输计划
         auto plan = context.getResults().initPlan();
         plan.setTargetServerIp(node->address);
-        plan.setTargetServerZmqPort(node->zmq_port); // 使用节点配置的ZMQ端口
+        plan.setTargetServerZmqPort(node->zmq_port);
         plan.setRemotePtr(allocInfo->remote_handle);
         plan.setError(CUDA_SUCCESS);
         
         return kj::READY_NOW;
     }
 
+    // GenericServices接口实现
+    kj::Promise<void> allocateMemory(AllocateMemoryContext context) override {
+        return memoryService_.allocateMemory(context);
+    }
+    
+    kj::Promise<void> freeMemory(FreeMemoryContext context) override {
+        return memoryService_.freeMemory(context);
+    }
+    
+    kj::Promise<void> executeTransfer(ExecuteTransferContext context) override {
+        return transportService_.executeTransfer(context);
+    }
+    
+    kj::Promise<void> handleMemAdvise(HandleMemAdviseContext context) override {
+        return adviseService_.handleMemAdvise(context);
+    }
+
 private:
     Dispatcher& dispatcher_;
+    MemoryService memoryService_;
+    TransportService transportService_;
+    AdviseService adviseService_;
 };
 
 // 配置文件监视器
@@ -143,8 +166,16 @@ int main() {
     Dispatcher dispatcher;
     dispatcher.LoadConfig(configPath);
 
-    // 创建RPC服务
-    capnp::EzRpcServer server(kj::heap<HookLauncherImpl>(dispatcher), "127.0.0.1:12345"); // 使用标准端口
+    // 创建服务依赖
+    GlobalMemoryManager memoryManager;
+    TransportManager transportManager;
+    CoolingService coolingService;
+    
+    // 创建聚合服务
+    capnp::EzRpcServer server(
+        kj::heap<RootService>(dispatcher, memoryManager, transportManager, coolingService), 
+        "127.0.0.1:12345"
+    );
     
     // 启动服务
     auto& waitScope = server.getWaitScope();

@@ -23,7 +23,7 @@ type CLIConfig struct {
     CurrentNUMAIndex int // 当前NUMA索引
     
     // NUMA 内存配置
-    NUMANode       int     // NUMA节点ID (0 or 1)
+    NumaId         int     // NUMA ID (0 or 1)
     MemPercent     float64 // 内存使用百分比 (1-90)
     VmemRatio      float64 // 显存占比 (0.1-0.9)
     
@@ -40,8 +40,8 @@ type CLIConfig struct {
     RDMADevices   []RDMADevice       `yaml:"rdma_devices,omitempty"` // RDMA设备列表
 }
 
-// NUMAPconfig 存储NUMA节点配置
-type NUMAPconfig struct {
+// NumaConfig 存储NUMA节点配置
+type NumaConfig struct {
 	MemPercent   float64
 	VmemRatio    float64
 	ControlIface string
@@ -54,7 +54,7 @@ type RDMADevice struct {
 	Description string `yaml:"description"`
 	InterfaceName string `yaml:"interface_name"` // 添加网口名称字段
 	MacvlanBindings []MacvlanBinding `yaml:"macvlan_bindings,omitempty"`
-	NUMANodes []int `yaml:"numa_nodes,omitempty"` // 添加NUMA节点绑定字段
+	NumaNodes []int `yaml:"numa_nodes,omitempty"` // 添加NUMA节点绑定字段
 }
 
 // MacvlanBinding 存储macvlan绑定配置
@@ -93,7 +93,7 @@ func DefaultCLIConfig() CLIConfig {
         MacvlanMode:    "bridge",
         
         // NUMA 内存配置默认值
-        NUMANode:       0,      // 默认NUMA节点0
+        NumaId:        0,      // 默认NUMA ID 0
         MemPercent:     80.0,   // 默认内存使用80%
         VmemRatio:      0.9,    // 默认显存占比90%
     }

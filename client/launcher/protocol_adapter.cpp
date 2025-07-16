@@ -8,9 +8,11 @@
 
 MemoryHandle ProtocolAdapter::convertToMemoryHandle(const RemoteAllocInfo& info) {
     MemoryHandle handle;
-    handle.setLocalPtr(info.fakePtr);
-    handle.setRemoteHandle(info.remote_handle);
+    auto id = handle.initId();
+    id.setHandle(info.remote_handle); // 使用统一ID类型
+    handle.setSize(info.size);
     handle.setNodeId(info.node_id);
+    handle.setLocalPtr(info.fakePtr);
     return handle;
 }
 #ifdef ENABLE_RDMA
@@ -102,8 +104,8 @@ void rdmaMemcpy(void* dst, const void* src, size_t count, enum rdma_memcpy_type 
 RemoteAllocInfo ProtocolAdapter::convertToRemoteAllocInfo(const MemoryHandle& handle) {
     return RemoteAllocInfo{
         .node_id = handle.getNodeId(),
-        .size = handle.getSize(), // 需要从服务端获取大小
-        .remote_handle = handle.getRemoteHandle(),
+        .size = handle.getSize(),
+        .remote_handle = handle.getId().getHandle(), // 从统一ID获取
         .fakePtr = handle.getLocalPtr()
     };
 }
@@ -125,7 +127,7 @@ KernelLaunch ProtocolAdapter::convertToKernelLaunch(
     launch.setBlockDimZ(blockDimZ);
     launch.setSharedMemBytes(sharedMemBytes);
     
-    // 转换参数 - 保留指针值但添加内存位置信息
+    // 计算参数数量
     int paramCount = 0;
     while (kernelParams[paramCount] != nullptr && paramCount < MAX_PARAMS) {
         paramCount++;
@@ -134,15 +136,32 @@ KernelLaunch ProtocolAdapter::convertToKernelLaunch(
     capnp::List<KernelParam>::Builder paramsBuilder = launch.initParams(paramCount);
     for (int i = 0; i < paramCount; ++i) {
         KernelParam::Builder param = paramsBuilder[i];
+        void* paramPtr = kernelParams[i];
         
-        // 保留原始指针值（用于零拷贝优化）
-        uint64_t ptrValue = reinterpret_cast<uint64_t>(kernelParams[i]);
-        param.setValue(ptrValue);
+        // 判断参数类型：指针还是标量
+        uint64_t paramValue = reinterpret_cast<uint64_t>(paramPtr);
+        auto location = g_launcher_client->getMemoryLocation(paramValue);
         
-        // 添加内存位置元数据
-        auto location = g_launcher_client->getMemoryLocation(ptrValue);
-        param.setNodeId(location.nodeId);
-        param.setMemoryType(location.memoryType);
+        if (location.nodeId != 0xFFFFFFFF) { // 有效内存位置
+            param.setType(ParamType::pointer);
+            
+            // 存储指针值和内存位置信息
+            auto valueBuilder = param.initValue(sizeof(uint64_t));
+            memcpy(valueBuilder.begin(), &paramValue, sizeof(uint64_t));
+            
+            param.setNodeId(location.nodeId);
+            param.setMemoryType(location.memoryType);
+        } else {
+            param.setType(ParamType::scalar);
+            
+            // 假设标量参数大小为8字节（处理int, float, double等）
+            auto valueBuilder = param.initValue(sizeof(uint64_t));
+            memcpy(valueBuilder.begin(), paramPtr, sizeof(uint64_t));
+        }
+        
+        // 设置默认对齐和偏移
+        param.setAlignment(8); // 8字节对齐
+        param.setOffset(0);
     }
     
     return launch;

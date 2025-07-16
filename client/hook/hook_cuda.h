@@ -1,15 +1,10 @@
 #pragma once
 #include <optional>
-
 #include <cuda.h>
 #include <shared_mutex>
 #include <unordered_map>
 #include <memory>
-#include <optional>
 #include <iostream>
-
-#include "context_manager.h"
-#include "rdma_manager.h"
 
 // 定义函数指针类型
 typedef CUresult (CUDAAPI *cuMemAlloc_t)(CUdeviceptr* dptr, size_t bytesize);

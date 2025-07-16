@@ -71,6 +71,43 @@ interface HookLauncher {
     -> (plan :RdmaPlan);
 }
 
+# ===== 统一服务接口 =====
+interface UnifiedServices {
+  # 内存操作接口
+  memoryOperation @0 (op :MemoryOp) -> (result :Common.Response);
+  
+  # 系统状态接口
+  getSystemStatus @1 () -> (status :SystemStatus);
+  
+  # 数据传输接口
+  transferData @2 (plan :TransferPlan) -> (result :Common.Response);
+  
+  # 访问记录接口
+  recordAccess @3 (access :AccessRecord) -> (result :Common.Response);
+  
+  # 建议服务
+  handleAdvise @4 (advice :AdviceRequest) -> (result :Common.Response);
+}
+
+# 标记旧方法为弃用（分阶段迁移）
+deprecated requestAllocationPlanV2 @16 (size: UInt64) -> (plan: AllocationPlan);
+
+enum TransferType {
+  hostToDevice @0;
+  deviceToHost @1;
+  deviceToDevice @2;
+}
+
+enum AccessType {
+  read @0;
+  write @1;
+}
+
+struct SystemStatus {
+  nodes @0 :List(NodeStatus);
+  heatmap @1 :Data;  # 二进制格式的热度图数据
+}
+
 struct RdmaPlan {
   success @0 :Bool;
   srcAddr @1 :UInt64;
