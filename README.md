@@ -23,6 +23,12 @@
 ```
 .
 ├── client
+│   ├── data_transfer             # 数据传输库
+│   │   ├── include
+│   │   │   └── data_transfer.h   # 数据传输头文件
+│   │   └── src
+│   │       ├── data_transfer.cpp # 数据传输实现
+│   │       └── zmq_manager.cpp   # ZMQ管理器
 │   ├── hook
 │   │   ├── easyhook_entry.cpp    # EasyHook入口点
 │   │   ├── hook_cuda.cpp         # CUDA API拦截实现
@@ -30,10 +36,12 @@
 │   │   ├── hook_cuda.h
 │   │   ├── launcher_client.cpp   # Launcher客户端通信
 │   │   ├── launcher_client.h
-│   │   ├── pch.h                 # 预编译头文件
+│   │   └── pch.h                 # 预编译头文件（解决C2894关键组件）
 │   └── launcher
 │       ├── dispatcher.cpp        # 请求分发器
 │       ├── dispatcher.h
+│       ├── launcher_client.cpp   # Launcher服务端客户端
+│       ├── launcher_client.h
 │       ├── main.cpp              # Launcher主入口
 │       ├── memory
 │       │   ├── global_memory.cpp # 全局内存管理
@@ -41,14 +49,14 @@
 │       │   └── numa_address.h    # Numa地址标识
 │       ├── protocol_adapter.cpp  # Cap'n Proto协议适配器
 │       └── transport
+│           ├── plank
+│           │   ├── plank_transport.cpp # 跳板传输实现
+│           │   └── plank_transport.h
 │           ├── rdma_transport.cpp # RDMA传输实现
 │           ├── rdma_transport.h
 │           ├── zmq_transport.cpp # ZeroMQ传输实现
 │           └── zmq_transport.h
-│           ├── plank
-│           │   ├── plank_transport.cpp # 跳板传输实现
-│           │   └── plank_transport.h
-│       ├── services
+│       └── services
 │           ├── advise_service.cpp   # 内存建议服务实现
 │           ├── advise_service.h
 │           ├── cooling_service.cpp  # 冷却服务实现
@@ -78,31 +86,25 @@
 │       └── main.go               # Cap'n Proto服务器
 ├── docker
 │   └── dockerfile.dockerfile     # Docker构建文件
-├── pkg
-│   └── numa
-│       ├── binding.go            # Numa设备绑定功能
-│       ├── discovery.go          # Numa拓扑发现
-│       └── opencapi.go           # OpenCAPI支持
 ├── proto
 │   ├── common.capnp              # 通用协议定义
+│   ├── common.capnp.c++          # 协议生成代码
+│   ├── common.capnp.h
 │   ├── cuda.capnp                # CUDA相关协议
+│   ├── cuda.capnp.c++
+│   ├── cuda.capnp.h
 │   ├── gpu-control.capnp         # GPU控制协议
+│   ├── gpu-control.capnp.c++
+│   ├── gpu-control.capnp.h
 │   ├── hook-launcher.capnp       # Hook-Launcher通信协议
+│   ├── hook-launcher.capnp.c++
+│   ├── hook-launcher.capnp.h
 │   ├── kernel.capnp              # 内核启动协议
+│   ├── kernel.capnp.c++
+│   ├── kernel.capnp.h
 │   ├── memcopy.capnp             # 内存复制协议
-│   └── proto                     # 协议生成代码
-│       ├── common.capnp.c++
-│       ├── common.capnp.h
-│       ├── cuda.capnp.c++
-│       ├── cuda.capnp.h
-│       ├── gpu-control.capnp.c++
-│       ├── gpu-control.capnp.h
-│       ├── hook-launcher.capnp.c++
-│       ├── hook-launcher.capnp.h
-│       ├── kernel.capnp.c++
-│       ├── kernel.capnp.h
-│       ├── memcopy.capnp.c++
-│       └── memcopy.capnp.h
+│   ├── memcopy.capnp.c++
+│   └── memcopy.capnp.h
 └── go.mod                        # Go模块定义
 ```
 
@@ -110,19 +112,52 @@
 
 | 文件路径 | 功能描述 |
 |----------|----------|
-| `client/hook/hook_cuda.cpp` | CUDA API拦截实现（基于服务层架构，含三维数据追踪+读写路径分离） |
+| `client/hook/hook_cuda.cpp` | CUDA API拦截实现（仅保留拦截逻辑，完全解耦服务依赖） |
+| `client/data_transfer/src/data_transfer.cpp` | 数据传输核心实现（独立服务） |
+| `client/data_transfer/src/zmq_manager.cpp` | ZMQ连接管理（带自动重连） |
+| `client/hook/pch.h` | 预编译头文件（解决C++模板作用域冲突） |
 | `client/launcher/services/memory_service.cpp` | 内存分配/释放服务 |
-| `client/launcher/services/transport_service.cpp` | 数据传输服务（内存复制/内核启动） |
+| `client/launcher/services/transport_service.cpp` | 数据传输协调服务 |
 | `client/launcher/services/advise_service.cpp` | 内存建议服务（预取/位置建议） |
-| `client/launcher/dispatcher.cpp` | 请求分发器（动态路径决策+显存稳定区管理+智能数据迁移） |
-| `client/launcher/transport/zmq_transport.cpp` | ZeroMQ UDP传输实现（带CRC校验） |
+| `client/launcher/services/cooling_service.cpp` | 数据热度监控服务 |
+| `client/launcher/dispatcher.cpp` | 请求分发器（动态路径决策+显存稳定区管理） |
+| `client/launcher/transport/zmq_transport.cpp` | ZeroMQ UDP传输实现 |
 | `client/launcher/transport/rdma_transport.cpp` | RDMA ROCE传输实现 |
 | `client/launcher/transport/plank/plank_transport.cpp` | 跳板传输实现（GDR-to-GDR） |
-| `client/launcher/services/cooling_service.cpp` | 数据热度监控服务 |
-| `pkg/numa/binding.go` | Numa设备绑定功能 |
-| `pkg/numa/discovery.go` | Numa拓扑发现 |
 | `cmd/aitherion-cli/numa/configure.go` | Numa节点配置 |
 | `proto/hook-launcher.capnp` | Hook与Launcher间通信协议 |
+
+## 架构优化亮点
+
+1. **职责分离**：
+   - Hook层仅负责API拦截（`hook_cuda.cpp`）
+   - 数据传输由独立服务处理（`data_transfer`）
+   - Launcher负责协调和服务管理
+
+2. **编译问题解决方案**：
+   - 重构`pch.h`解决C2894模板作用域冲突
+   - 严格分离C/C++头文件作用域
+
+3. **三维数据特性增强**：
+   ```mermaid
+   graph TD
+     A[数据特性] --> B(热度)
+     A --> C(温度)
+     A --> D(流动性)
+     A --> E(稳定性)
+     B --> F[访问频率统计]
+     C --> G[实时热度量化]
+     D --> H[跨节点迁移追踪]
+     E --> I[生存周期评估]
+     F --> J[自动预取]
+     G --> K[冷热数据分层]
+     H --> L[迁移优化]
+     I --> M[显存稳定区管理]
+   ```
+
+4. **服务层接口规范**：
+   - 所有服务通过`launcher_client.h`明确定义接口
+   - 严格的前向声明避免头文件污染
 
 ## 关键功能实现验证
 
