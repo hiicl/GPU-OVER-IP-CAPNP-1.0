@@ -1,10 +1,6 @@
 // 将文件保存为 UTF-8 编码以修复编码问题
 #include "pch.h" // 预编译头必须放在最前面
-#include "launcher_client.h"
-#include <kj/debug.h>
-#include <capnp/message.h>
-#include <capnp/serialize.h>
-#include <stdexcept>
+#include "launcher_client.h" // 当前模块专用头文件
 
 LauncherClient::LauncherClient(const std::string& address) 
     : m_address(address) {}

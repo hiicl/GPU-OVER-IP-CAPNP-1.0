@@ -1,12 +1,17 @@
 #pragma once
+#include "pch.h" // 预编译头必须放在最前面
 
+// 项目特定头文件
 #include "hook-launcher.capnp.h"
 #include "common.capnp.h"
+
+// 第三方库
 #include <capnp/ez-rpc.h>
+
+// 标准库
 #include <memory>
-#include <string>  
-#include <cstdint>  
-#include "pch.h"
+#include <string>
+#include <cstdint>
 
 class LauncherClient {
 public:

@@ -1,17 +1,7 @@
 // CUDA API Hook实现模块 - 重构版本
 // 将文件保存为 UTF-8 编码以修复编码问题
 #include "pch.h" // 预编译头必须放在最前面
-#include "hook_cuda.h"
-#include "hook-launcher.capnp.h"
-#include "cuda.capnp.h"
-#include "../launcher/launcher_client.h" // 新增LauncherClient头文件
-#include "../data_transfer/include/data_transfer.h" // 添加数据传输模块头文件
-#include <iostream>
-#include <mutex>
-#include <map>
-#include <string>
-#include <kj/common.h>
-#include <kj/debug.h>
+#include "hook_cuda.h" // 当前模块专用头文件
 
 using namespace hook_launcher;
 

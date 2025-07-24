@@ -1,10 +1,6 @@
 #pragma once
-#include <optional>
-#include <cuda.h>
-#include <shared_mutex>
-#include <unordered_map>
-#include <memory>
-#include <iostream>
+#include <cuda.h> // CUDA核心功能
+#include <optional> // C++17可选类型
 
 // 定义函数指针类型
 typedef CUresult (CUDAAPI *cuMemAlloc_t)(CUdeviceptr* dptr, size_t bytesize);

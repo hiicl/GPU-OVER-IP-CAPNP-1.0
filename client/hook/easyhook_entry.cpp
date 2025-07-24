@@ -1,10 +1,6 @@
 // 将文件保存为 UTF-8 编码以修复编码问题
 #include "pch.h" // 预编译头必须放在最前面
-#include <Windows.h>
-#include <easyhook.h>
-#include <iostream> // 添加iostream头文件
-#include "../hook/hook_cuda.h"
-#include "../launcher/launcher_client.h"
+#include "../hook/hook_cuda.h" // Hook实现头文件
 
 // 全局LauncherClient对象
 std::unique_ptr<LauncherClient> g_launcher_client;
