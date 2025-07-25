@@ -15,27 +15,27 @@
 
 class LauncherClient {
 public:
-    LauncherClient(const std::string& address);
+    explicit LauncherClient(const std::string& address);
     bool Connect(const std::string& address); // 修正为单参数Connect方法
     bool connect();
     
     // HookLauncher接口实现
-    hook_launcher::AllocationResult::Reader requestAllocation(uint64_t size);
-    common::ErrorCode requestFree(uint64_t fakePtr);
-    hook_launcher::MemcpyPlan::Reader planMemcpyHtoD(uint64_t dstFakePtr, uint64_t size);
-    hook_launcher::MemcpyPlan::Reader planMemcpyDtoH(uint64_t srcFakePtr, uint64_t size);
-    common::ErrorCode launchKernel(const std::string& func, 
-                                   uint32_t gridDim, 
-                                   uint32_t blockDim,
-                                   uint32_t sharedMem,
-                                   const void* params);
+    AllocationPlan::Reader requestAllocationPlan(uint64_t size);
+    ErrorCode requestFreePlan(uint64_t fakePtr);
+    MemcpyPlan::Reader planMemcpyHtoD(uint64_t dstFakePtr, uint64_t size);
+    MemcpyPlan::Reader planMemcpyDtoH(uint64_t srcFakePtr, uint64_t size);
+    ErrorCode launchKernel(const std::string& func, 
+                          uint32_t gridDimX, uint32_t gridDimY, uint32_t gridDimZ,
+                          uint32_t blockDimX, uint32_t blockDimY, uint32_t blockDimZ,
+                          uint32_t sharedMemBytes,
+                          const void* params);
     
     // ===== 新增高级功能方法 =====
-    hook_launcher::NodeInfo::Reader getMemoryLocation(uint64_t fakePtr);
-    common::ErrorCode advisePrefetch(uint64_t fakePtr);
+    NodeInfo::Reader getMemoryLocation(uint64_t fakePtr);
+    ErrorCode advisePrefetch(uint64_t fakePtr);
     
 private:
     std::string m_address;
     std::unique_ptr<capnp::EzRpcClient> m_rpcClient;
-    hook_launcher::HookLauncher::Client m_client;
+    HookLauncher::Client m_client{nullptr}; // 初始化客户端为nullptr
 };

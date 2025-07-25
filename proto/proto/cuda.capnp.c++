@@ -430,7 +430,7 @@ static const ::capnp::_::AlignedData<191> b_d909ac68956b8ff9 = {
      68,  68,  34,  34, 204, 204, 187, 187,
       0,   0,   0,   0,   0,   0,   0,   0,
       0,   0,   0,   0,   0,   0,   0,   0,
-    193,   3,   0,   0, 123,   8,   0,   0,
+    193,   3,   0,   0, 127,   8,   0,   0,
      21,   0,   0,   0, 186,   0,   0,   0,
      29,   0,   0,   0,   7,   0,   0,   0,
       0,   0,   0,   0,   0,   0,   0,   0,
@@ -807,7 +807,7 @@ static const ::capnp::_::AlignedData<35> b_9aa2f69630ae6c9c = {
      20,   0,   0,   0,   2,   0,   1,   0,
     114, 101, 115, 117, 108, 116,   0,   0,
      16,   0,   0,   0,   0,   0,   0,   0,
-    174,   8, 226, 224, 226, 183,  50, 240,
+     59, 168, 171,   5, 171, 169, 148, 155,
       0,   0,   0,   0,   0,   0,   0,   0,
       0,   0,   0,   0,   0,   0,   0,   0,
      16,   0,   0,   0,   0,   0,   0,   0,
@@ -817,7 +817,7 @@ static const ::capnp::_::AlignedData<35> b_9aa2f69630ae6c9c = {
 ::capnp::word const* const bp_9aa2f69630ae6c9c = b_9aa2f69630ae6c9c.words;
 #if !CAPNP_LITE
 static const ::capnp::_::RawSchema* const d_9aa2f69630ae6c9c[] = {
-  &s_f032b7e2e0e208ae,
+  &s_9b94a9ab05aba83b,
 };
 static const uint16_t m_9aa2f69630ae6c9c[] = {0};
 static const uint16_t i_9aa2f69630ae6c9c[] = {0};
@@ -2099,7 +2099,7 @@ static const ::capnp::_::AlignedData<35> b_8174b4e554088fa5 = {
      20,   0,   0,   0,   2,   0,   1,   0,
     114, 101, 115, 117, 108, 116,   0,   0,
      16,   0,   0,   0,   0,   0,   0,   0,
-    174,   8, 226, 224, 226, 183,  50, 240,
+     59, 168, 171,   5, 171, 169, 148, 155,
       0,   0,   0,   0,   0,   0,   0,   0,
       0,   0,   0,   0,   0,   0,   0,   0,
      16,   0,   0,   0,   0,   0,   0,   0,
@@ -2109,7 +2109,7 @@ static const ::capnp::_::AlignedData<35> b_8174b4e554088fa5 = {
 ::capnp::word const* const bp_8174b4e554088fa5 = b_8174b4e554088fa5.words;
 #if !CAPNP_LITE
 static const ::capnp::_::RawSchema* const d_8174b4e554088fa5[] = {
-  &s_f032b7e2e0e208ae,
+  &s_9b94a9ab05aba83b,
 };
 static const uint16_t m_8174b4e554088fa5[] = {0};
 static const uint16_t i_8174b4e554088fa5[] = {0};

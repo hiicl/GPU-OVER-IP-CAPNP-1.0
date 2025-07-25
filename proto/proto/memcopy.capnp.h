@@ -15,27 +15,70 @@
 #error "Version mismatch between generated code and library headers.  You must use the same version of the Cap'n Proto compiler and library."
 #endif
 
+#include "common.capnp.h"
 
 CAPNP_BEGIN_HEADER
 
 namespace capnp {
 namespace schemas {
 
-CAPNP_DECLARE_SCHEMA(f9beaa33375041b1);
+CAPNP_DECLARE_SCHEMA(bfbb01f7c22a476e);
+CAPNP_DECLARE_SCHEMA(e99466c69afeb3b6);
+CAPNP_DECLARE_SCHEMA(b1846500d8538ab3);
+enum class OperationType_b1846500d8538ab3: uint16_t {
+  COPY,
+  SET,
+  READ,
+  GDR,
+};
+CAPNP_DECLARE_ENUM(OperationType, b1846500d8538ab3);
+CAPNP_DECLARE_SCHEMA(cc682938866a54f1);
 
 }  // namespace schemas
 }  // namespace capnp
 
 
-struct MemcopyCommand {
-  MemcopyCommand() = delete;
+struct RdmaEndpoint {
+  RdmaEndpoint() = delete;
 
   class Reader;
   class Builder;
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(f9beaa33375041b1, 3, 1)
+    CAPNP_DECLARE_STRUCT_HEADER(bfbb01f7c22a476e, 1, 2)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
+struct RdmaPlan {
+  RdmaPlan() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(e99466c69afeb3b6, 4, 0)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
+typedef ::capnp::schemas::OperationType_b1846500d8538ab3 OperationType;
+
+struct MemoryOp {
+  MemoryOp() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(cc682938866a54f1, 2, 4)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -44,9 +87,9 @@ struct MemcopyCommand {
 
 // =======================================================================================
 
-class MemcopyCommand::Reader {
+class RdmaEndpoint::Reader {
 public:
-  typedef MemcopyCommand Reads;
+  typedef RdmaEndpoint Reads;
 
   Reader() = default;
   inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
@@ -61,18 +104,15 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline  ::uint8_t getOpType() const;
+  inline bool hasIp() const;
+  inline  ::capnp::Text::Reader getIp() const;
 
-  inline  ::uint64_t getDstAddress() const;
+  inline  ::uint16_t getPort() const;
 
-  inline  ::uint32_t getDataSize() const;
+  inline bool hasGid() const;
+  inline  ::capnp::Data::Reader getGid() const;
 
-  inline  ::uint8_t getValue() const;
-
-  inline bool hasData() const;
-  inline  ::capnp::Data::Reader getData() const;
-
-  inline  ::uint32_t getChecksum() const;
+  inline  ::uint32_t getKey() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -86,9 +126,9 @@ private:
   friend class ::capnp::Orphanage;
 };
 
-class MemcopyCommand::Builder {
+class RdmaEndpoint::Builder {
 public:
-  typedef MemcopyCommand Builds;
+  typedef RdmaEndpoint Builds;
 
   Builder() = delete;  // Deleted to discourage incorrect usage.
                        // You can explicitly initialize to nullptr instead.
@@ -102,14 +142,229 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline  ::uint8_t getOpType();
-  inline void setOpType( ::uint8_t value);
+  inline bool hasIp();
+  inline  ::capnp::Text::Builder getIp();
+  inline void setIp( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initIp(unsigned int size);
+  inline void adoptIp(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownIp();
 
-  inline  ::uint64_t getDstAddress();
-  inline void setDstAddress( ::uint64_t value);
+  inline  ::uint16_t getPort();
+  inline void setPort( ::uint16_t value);
 
-  inline  ::uint32_t getDataSize();
-  inline void setDataSize( ::uint32_t value);
+  inline bool hasGid();
+  inline  ::capnp::Data::Builder getGid();
+  inline void setGid( ::capnp::Data::Reader value);
+  inline  ::capnp::Data::Builder initGid(unsigned int size);
+  inline void adoptGid(::capnp::Orphan< ::capnp::Data>&& value);
+  inline ::capnp::Orphan< ::capnp::Data> disownGid();
+
+  inline  ::uint32_t getKey();
+  inline void setKey( ::uint32_t value);
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class RdmaEndpoint::Pipeline {
+public:
+  typedef RdmaEndpoint Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
+class RdmaPlan::Reader {
+public:
+  typedef RdmaPlan Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline bool getSuccess() const;
+
+  inline  ::uint64_t getSrcAddr() const;
+
+  inline  ::uint32_t getSrcKey() const;
+
+  inline  ::uint64_t getDstAddr() const;
+
+  inline  ::uint32_t getDstKey() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class RdmaPlan::Builder {
+public:
+  typedef RdmaPlan Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline bool getSuccess();
+  inline void setSuccess(bool value);
+
+  inline  ::uint64_t getSrcAddr();
+  inline void setSrcAddr( ::uint64_t value);
+
+  inline  ::uint32_t getSrcKey();
+  inline void setSrcKey( ::uint32_t value);
+
+  inline  ::uint64_t getDstAddr();
+  inline void setDstAddr( ::uint64_t value);
+
+  inline  ::uint32_t getDstKey();
+  inline void setDstKey( ::uint32_t value);
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class RdmaPlan::Pipeline {
+public:
+  typedef RdmaPlan Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
+class MemoryOp::Reader {
+public:
+  typedef MemoryOp Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline  ::OperationType getType() const;
+
+  inline bool hasTarget() const;
+  inline  ::MemoryHandle::Reader getTarget() const;
+
+  inline bool hasSource() const;
+  inline  ::MemoryHandle::Reader getSource() const;
+
+  inline  ::uint8_t getValue() const;
+
+  inline bool hasData() const;
+  inline  ::capnp::Data::Reader getData() const;
+
+  inline  ::uint32_t getChecksum() const;
+
+  inline bool hasEndpoint() const;
+  inline  ::RdmaEndpoint::Reader getEndpoint() const;
+
+  inline  ::uint32_t getFlags() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class MemoryOp::Builder {
+public:
+  typedef MemoryOp Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline  ::OperationType getType();
+  inline void setType( ::OperationType value);
+
+  inline bool hasTarget();
+  inline  ::MemoryHandle::Builder getTarget();
+  inline void setTarget( ::MemoryHandle::Reader value);
+  inline  ::MemoryHandle::Builder initTarget();
+  inline void adoptTarget(::capnp::Orphan< ::MemoryHandle>&& value);
+  inline ::capnp::Orphan< ::MemoryHandle> disownTarget();
+
+  inline bool hasSource();
+  inline  ::MemoryHandle::Builder getSource();
+  inline void setSource( ::MemoryHandle::Reader value);
+  inline  ::MemoryHandle::Builder initSource();
+  inline void adoptSource(::capnp::Orphan< ::MemoryHandle>&& value);
+  inline ::capnp::Orphan< ::MemoryHandle> disownSource();
 
   inline  ::uint8_t getValue();
   inline void setValue( ::uint8_t value);
@@ -124,6 +379,16 @@ public:
   inline  ::uint32_t getChecksum();
   inline void setChecksum( ::uint32_t value);
 
+  inline bool hasEndpoint();
+  inline  ::RdmaEndpoint::Builder getEndpoint();
+  inline void setEndpoint( ::RdmaEndpoint::Reader value);
+  inline  ::RdmaEndpoint::Builder initEndpoint();
+  inline void adoptEndpoint(::capnp::Orphan< ::RdmaEndpoint>&& value);
+  inline ::capnp::Orphan< ::RdmaEndpoint> disownEndpoint();
+
+  inline  ::uint32_t getFlags();
+  inline void setFlags( ::uint32_t value);
+
 private:
   ::capnp::_::StructBuilder _builder;
   template <typename, ::capnp::Kind>
@@ -134,14 +399,17 @@ private:
 };
 
 #if !CAPNP_LITE
-class MemcopyCommand::Pipeline {
+class MemoryOp::Pipeline {
 public:
-  typedef MemcopyCommand Pipelines;
+  typedef MemoryOp Pipelines;
 
   inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
+  inline  ::MemoryHandle::Pipeline getTarget();
+  inline  ::MemoryHandle::Pipeline getSource();
+  inline  ::RdmaEndpoint::Pipeline getEndpoint();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -152,108 +420,377 @@ private:
 
 // =======================================================================================
 
-inline  ::uint8_t MemcopyCommand::Reader::getOpType() const {
-  return _reader.getDataField< ::uint8_t>(
+inline bool RdmaEndpoint::Reader::hasIp() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline bool RdmaEndpoint::Builder::hasIp() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader RdmaEndpoint::Reader::getIp() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder RdmaEndpoint::Builder::getIp() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline void RdmaEndpoint::Builder::setIp( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder RdmaEndpoint::Builder::initIp(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), size);
+}
+inline void RdmaEndpoint::Builder::adoptIp(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> RdmaEndpoint::Builder::disownIp() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+
+inline  ::uint16_t RdmaEndpoint::Reader::getPort() const {
+  return _reader.getDataField< ::uint16_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
 
-inline  ::uint8_t MemcopyCommand::Builder::getOpType() {
-  return _builder.getDataField< ::uint8_t>(
+inline  ::uint16_t RdmaEndpoint::Builder::getPort() {
+  return _builder.getDataField< ::uint16_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
-inline void MemcopyCommand::Builder::setOpType( ::uint8_t value) {
-  _builder.setDataField< ::uint8_t>(
+inline void RdmaEndpoint::Builder::setPort( ::uint16_t value) {
+  _builder.setDataField< ::uint16_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::uint64_t MemcopyCommand::Reader::getDstAddress() const {
+inline bool RdmaEndpoint::Reader::hasGid() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+}
+inline bool RdmaEndpoint::Builder::hasGid() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Data::Reader RdmaEndpoint::Reader::getGid() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Data>::get(_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Data::Builder RdmaEndpoint::Builder::getGid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Data>::get(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+inline void RdmaEndpoint::Builder::setGid( ::capnp::Data::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Data>::set(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Data::Builder RdmaEndpoint::Builder::initGid(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Data>::init(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), size);
+}
+inline void RdmaEndpoint::Builder::adoptGid(
+    ::capnp::Orphan< ::capnp::Data>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Data>::adopt(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Data> RdmaEndpoint::Builder::disownGid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Data>::disown(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+
+inline  ::uint32_t RdmaEndpoint::Reader::getKey() const {
+  return _reader.getDataField< ::uint32_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint32_t RdmaEndpoint::Builder::getKey() {
+  return _builder.getDataField< ::uint32_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+inline void RdmaEndpoint::Builder::setKey( ::uint32_t value) {
+  _builder.setDataField< ::uint32_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool RdmaPlan::Reader::getSuccess() const {
+  return _reader.getDataField<bool>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+
+inline bool RdmaPlan::Builder::getSuccess() {
+  return _builder.getDataField<bool>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+inline void RdmaPlan::Builder::setSuccess(bool value) {
+  _builder.setDataField<bool>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::uint64_t RdmaPlan::Reader::getSrcAddr() const {
   return _reader.getDataField< ::uint64_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS);
 }
 
-inline  ::uint64_t MemcopyCommand::Builder::getDstAddress() {
+inline  ::uint64_t RdmaPlan::Builder::getSrcAddr() {
   return _builder.getDataField< ::uint64_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS);
 }
-inline void MemcopyCommand::Builder::setDstAddress( ::uint64_t value) {
+inline void RdmaPlan::Builder::setSrcAddr( ::uint64_t value) {
   _builder.setDataField< ::uint64_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::uint32_t MemcopyCommand::Reader::getDataSize() const {
+inline  ::uint32_t RdmaPlan::Reader::getSrcKey() const {
   return _reader.getDataField< ::uint32_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS);
 }
 
-inline  ::uint32_t MemcopyCommand::Builder::getDataSize() {
+inline  ::uint32_t RdmaPlan::Builder::getSrcKey() {
   return _builder.getDataField< ::uint32_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS);
 }
-inline void MemcopyCommand::Builder::setDataSize( ::uint32_t value) {
+inline void RdmaPlan::Builder::setSrcKey( ::uint32_t value) {
   _builder.setDataField< ::uint32_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::uint8_t MemcopyCommand::Reader::getValue() const {
-  return _reader.getDataField< ::uint8_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+inline  ::uint64_t RdmaPlan::Reader::getDstAddr() const {
+  return _reader.getDataField< ::uint64_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
 }
 
-inline  ::uint8_t MemcopyCommand::Builder::getValue() {
-  return _builder.getDataField< ::uint8_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+inline  ::uint64_t RdmaPlan::Builder::getDstAddr() {
+  return _builder.getDataField< ::uint64_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
 }
-inline void MemcopyCommand::Builder::setValue( ::uint8_t value) {
-  _builder.setDataField< ::uint8_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+inline void RdmaPlan::Builder::setDstAddr( ::uint64_t value) {
+  _builder.setDataField< ::uint64_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS, value);
 }
 
-inline bool MemcopyCommand::Reader::hasData() const {
+inline  ::uint32_t RdmaPlan::Reader::getDstKey() const {
+  return _reader.getDataField< ::uint32_t>(
+      ::capnp::bounded<6>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint32_t RdmaPlan::Builder::getDstKey() {
+  return _builder.getDataField< ::uint32_t>(
+      ::capnp::bounded<6>() * ::capnp::ELEMENTS);
+}
+inline void RdmaPlan::Builder::setDstKey( ::uint32_t value) {
+  _builder.setDataField< ::uint32_t>(
+      ::capnp::bounded<6>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::OperationType MemoryOp::Reader::getType() const {
+  return _reader.getDataField< ::OperationType>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+
+inline  ::OperationType MemoryOp::Builder::getType() {
+  return _builder.getDataField< ::OperationType>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+inline void MemoryOp::Builder::setType( ::OperationType value) {
+  _builder.setDataField< ::OperationType>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool MemoryOp::Reader::hasTarget() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline bool MemcopyCommand::Builder::hasData() {
+inline bool MemoryOp::Builder::hasTarget() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::Data::Reader MemcopyCommand::Reader::getData() const {
-  return ::capnp::_::PointerHelpers< ::capnp::Data>::get(_reader.getPointerField(
+inline  ::MemoryHandle::Reader MemoryOp::Reader::getTarget() const {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::capnp::Data::Builder MemcopyCommand::Builder::getData() {
-  return ::capnp::_::PointerHelpers< ::capnp::Data>::get(_builder.getPointerField(
+inline  ::MemoryHandle::Builder MemoryOp::Builder::getTarget() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void MemcopyCommand::Builder::setData( ::capnp::Data::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::Data>::set(_builder.getPointerField(
+#if !CAPNP_LITE
+inline  ::MemoryHandle::Pipeline MemoryOp::Pipeline::getTarget() {
+  return  ::MemoryHandle::Pipeline(_typeless.getPointerField(0));
+}
+#endif  // !CAPNP_LITE
+inline void MemoryOp::Builder::setTarget( ::MemoryHandle::Reader value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::Data::Builder MemcopyCommand::Builder::initData(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::Data>::init(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), size);
+inline  ::MemoryHandle::Builder MemoryOp::Builder::initTarget() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::init(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void MemcopyCommand::Builder::adoptData(
-    ::capnp::Orphan< ::capnp::Data>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::Data>::adopt(_builder.getPointerField(
+inline void MemoryOp::Builder::adoptTarget(
+    ::capnp::Orphan< ::MemoryHandle>&& value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::Data> MemcopyCommand::Builder::disownData() {
-  return ::capnp::_::PointerHelpers< ::capnp::Data>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::MemoryHandle> MemoryOp::Builder::disownTarget() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
-inline  ::uint32_t MemcopyCommand::Reader::getChecksum() const {
-  return _reader.getDataField< ::uint32_t>(
-      ::capnp::bounded<4>() * ::capnp::ELEMENTS);
+inline bool MemoryOp::Reader::hasSource() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+}
+inline bool MemoryOp::Builder::hasSource() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+}
+inline  ::MemoryHandle::Reader MemoryOp::Reader::getSource() const {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+inline  ::MemoryHandle::Builder MemoryOp::Builder::getSource() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::get(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+#if !CAPNP_LITE
+inline  ::MemoryHandle::Pipeline MemoryOp::Pipeline::getSource() {
+  return  ::MemoryHandle::Pipeline(_typeless.getPointerField(1));
+}
+#endif  // !CAPNP_LITE
+inline void MemoryOp::Builder::setSource( ::MemoryHandle::Reader value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::set(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
+}
+inline  ::MemoryHandle::Builder MemoryOp::Builder::initSource() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::init(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+inline void MemoryOp::Builder::adoptSource(
+    ::capnp::Orphan< ::MemoryHandle>&& value) {
+  ::capnp::_::PointerHelpers< ::MemoryHandle>::adopt(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::MemoryHandle> MemoryOp::Builder::disownSource() {
+  return ::capnp::_::PointerHelpers< ::MemoryHandle>::disown(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 
-inline  ::uint32_t MemcopyCommand::Builder::getChecksum() {
-  return _builder.getDataField< ::uint32_t>(
-      ::capnp::bounded<4>() * ::capnp::ELEMENTS);
+inline  ::uint8_t MemoryOp::Reader::getValue() const {
+  return _reader.getDataField< ::uint8_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
 }
-inline void MemcopyCommand::Builder::setChecksum( ::uint32_t value) {
+
+inline  ::uint8_t MemoryOp::Builder::getValue() {
+  return _builder.getDataField< ::uint8_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
+}
+inline void MemoryOp::Builder::setValue( ::uint8_t value) {
+  _builder.setDataField< ::uint8_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool MemoryOp::Reader::hasData() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
+}
+inline bool MemoryOp::Builder::hasData() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Data::Reader MemoryOp::Reader::getData() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Data>::get(_reader.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Data::Builder MemoryOp::Builder::getData() {
+  return ::capnp::_::PointerHelpers< ::capnp::Data>::get(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
+}
+inline void MemoryOp::Builder::setData( ::capnp::Data::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Data>::set(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Data::Builder MemoryOp::Builder::initData(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Data>::init(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS), size);
+}
+inline void MemoryOp::Builder::adoptData(
+    ::capnp::Orphan< ::capnp::Data>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Data>::adopt(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Data> MemoryOp::Builder::disownData() {
+  return ::capnp::_::PointerHelpers< ::capnp::Data>::disown(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
+}
+
+inline  ::uint32_t MemoryOp::Reader::getChecksum() const {
+  return _reader.getDataField< ::uint32_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint32_t MemoryOp::Builder::getChecksum() {
+  return _builder.getDataField< ::uint32_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+inline void MemoryOp::Builder::setChecksum( ::uint32_t value) {
   _builder.setDataField< ::uint32_t>(
-      ::capnp::bounded<4>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool MemoryOp::Reader::hasEndpoint() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+}
+inline bool MemoryOp::Builder::hasEndpoint() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+}
+inline  ::RdmaEndpoint::Reader MemoryOp::Reader::getEndpoint() const {
+  return ::capnp::_::PointerHelpers< ::RdmaEndpoint>::get(_reader.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
+}
+inline  ::RdmaEndpoint::Builder MemoryOp::Builder::getEndpoint() {
+  return ::capnp::_::PointerHelpers< ::RdmaEndpoint>::get(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
+}
+#if !CAPNP_LITE
+inline  ::RdmaEndpoint::Pipeline MemoryOp::Pipeline::getEndpoint() {
+  return  ::RdmaEndpoint::Pipeline(_typeless.getPointerField(3));
+}
+#endif  // !CAPNP_LITE
+inline void MemoryOp::Builder::setEndpoint( ::RdmaEndpoint::Reader value) {
+  ::capnp::_::PointerHelpers< ::RdmaEndpoint>::set(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS), value);
+}
+inline  ::RdmaEndpoint::Builder MemoryOp::Builder::initEndpoint() {
+  return ::capnp::_::PointerHelpers< ::RdmaEndpoint>::init(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
+}
+inline void MemoryOp::Builder::adoptEndpoint(
+    ::capnp::Orphan< ::RdmaEndpoint>&& value) {
+  ::capnp::_::PointerHelpers< ::RdmaEndpoint>::adopt(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::RdmaEndpoint> MemoryOp::Builder::disownEndpoint() {
+  return ::capnp::_::PointerHelpers< ::RdmaEndpoint>::disown(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
+}
+
+inline  ::uint32_t MemoryOp::Reader::getFlags() const {
+  return _reader.getDataField< ::uint32_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint32_t MemoryOp::Builder::getFlags() {
+  return _builder.getDataField< ::uint32_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
+}
+inline void MemoryOp::Builder::setFlags( ::uint32_t value) {
+  _builder.setDataField< ::uint32_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS, value);
 }
 
 

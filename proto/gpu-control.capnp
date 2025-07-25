@@ -15,23 +15,6 @@ struct GpuStatus {
     utilization @1 :Int32;   # GPU利用率(百分比)
 }
 
-struct Ack {
-    ok @0 :Bool;             # 操作是否成功
-    msg @1 :Text;            # 附加消息
-    code @2 :Common.ErrorCode; # 错误代码
-} # 通用响应结构
-
-struct RunRequest {
-    uuid @0 :Common.UUID;    # 目标GPU的UUID
-    cmd @1 :Text;            # 要执行的命令
-    streamHandle @2 :Common.Handle; # 关联的流句柄
-} # 命令执行请求
-
-struct RunResponse {
-    exitCode @0 :Int32;      # 命令退出码
-    output @1 :Text;         # 命令输出
-} # 命令执行响应
-
 struct Path {
     type @0 :PathType;       # 路径类型(NVLink/XBus/RoCE)
     steps @1 :List(Step);    # 路径步骤
@@ -69,7 +52,18 @@ interface Scheduler {
     
     listGpus @3 () -> (gpus :GpuList); # 列出所有GPU信息
     getGpuStatus @4 (request :GpuRequest) -> (status :GpuStatus); # 获取GPU状态
-    acquireGpu @5 (request :GpuRequest) -> (ack :Ack); # 申请GPU资源
-    releaseGpu @6 (request :GpuRequest) -> (ack :Ack); # 释放GPU资源
+    acquireGpu @5 (request :GpuRequest) -> (ack :Common.Ack); # 申请GPU资源
+    releaseGpu @6 (request :GpuRequest) -> (ack :Common.Ack); # 释放GPU资源
     runCommand @7 (request :RunRequest) -> (response :RunResponse); # 在GPU上执行命令
 } # GPU资源调度接口
+
+struct RunRequest {
+    uuid @0 :Common.UUID;    # 目标GPU的UUID
+    cmd @1 :Text;            # 要执行的命令
+    streamHandle @2 :Common.Handle; # 关联的流句柄
+} # 命令执行请求
+
+struct RunResponse {
+    exitCode @0 :Int32;      # 命令退出码
+    output @1 :Text;         # 命令输出
+} # 命令执行响应

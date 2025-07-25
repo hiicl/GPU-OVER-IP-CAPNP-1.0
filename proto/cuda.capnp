@@ -47,7 +47,7 @@ struct MultiGpuRequest {
 interface CudaService {
     cudaInit @0 () -> (ack :Common.Ack); # 初始化CUDA环境
     
-    cudaMemAlloc @1 (size :UInt64) -> (result :Common.Result); # 分配显存
+    cudaMemAlloc @1 (size :UInt64) -> (result :Common.Response); # 分配显存
     
     cudaMemcpy @2 (params :MemcpyParams) -> (ack :Common.Ack); # 执行内存复制
     
@@ -67,5 +67,5 @@ interface CudaService {
     batchKernelLaunch @12 (request :BatchKernelLaunch) -> (ack :Common.Ack);
     multiGpuCooperation @13 (request :MultiGpuRequest) -> (ack :Common.Ack);
     
-    allocAndWrite @14 (size :UInt64, data :Data) -> (result :Common.Result); # 分配显存并写入数据
+    allocAndWrite @14 (size :UInt64, data :Data) -> (result :Common.Response); # 分配显存并写入数据
 }

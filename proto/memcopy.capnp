@@ -8,6 +8,14 @@ struct RdmaEndpoint {
   key @3 :UInt32; # RDMA访问密钥
 }
 
+struct RdmaPlan {
+  success @0 :Bool;
+  srcAddr @1 :UInt64;
+  srcKey @2 :UInt32;
+  dstAddr @3 :UInt64;
+  dstKey @4 :UInt32;
+}
+
 enum OperationType {
   copy @0;   # 内存复制
   set @1;    # 内存设置

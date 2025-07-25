@@ -15,6 +15,7 @@ typedef CUresult (CUDAAPI *cuLaunchKernel_t)(
     void** kernelParams, void** extra);
 
 // 声明全局函数指针为extern
+// 声明全局函数指针（extern）
 extern cuMemAlloc_t pOriginal_cuMemAlloc;
 extern cuMemFree_t pOriginal_cuMemFree;
 extern cuMemcpyHtoD_t pOriginal_cuMemcpyHtoD;

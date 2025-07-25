@@ -3,18 +3,13 @@
 #include "launcher_client.h" // 当前模块专用头文件
 
 LauncherClient::LauncherClient(const std::string& address) 
-    : m_address(address) {}
-
-bool LauncherClient::Connect(const std::string& address) {
-    m_address = address; // 更新地址
-    return connect(); // 调用现有的连接逻辑
-}
+    : m_address(address), m_client(nullptr) {}
 
 bool LauncherClient::connect() {
     try {
         m_rpcClient = std::make_unique<capnp::EzRpcClient>(m_address);
         auto& waitScope = m_rpcClient->getWaitScope();
-        m_client = m_rpcClient->getMain<hook_launcher::HookLauncher>();
+        m_client = m_rpcClient->getMain<HookLauncher>();
         return true;
     } catch (const std::exception& e) {
         KJ_LOG(ERROR, "Failed to connect to launcher", e.what());
@@ -22,66 +17,75 @@ bool LauncherClient::connect() {
     }
 }
 
-hook_launcher::AllocationResult::Reader LauncherClient::requestAllocation(uint64_t size) {
-    auto request = m_client.requestAllocationRequest();
+AllocationPlan::Reader LauncherClient::requestAllocationPlan(uint64_t size) {
+    auto request = m_client.requestAllocationPlanRequest();
     request.setSize(size);
     auto response = request.send().wait(m_rpcClient->getWaitScope());
-    return response.getResult();
+    return response.getPlan();
 }
 
-common::ErrorCode LauncherClient::requestFree(uint64_t fakePtr) {
-    auto request = m_client.requestFreeRequest();
+ErrorCode LauncherClient::requestFreePlan(uint64_t fakePtr) {
+    auto request = m_client.requestFreePlanRequest();
     request.setFakePtr(fakePtr);
     auto response = request.send().wait(m_rpcClient->getWaitScope());
-    return response.getResult();
+    return static_cast<ErrorCode>(response.getAck().getCode());
 }
 
-hook_launcher::MemcpyPlan::Reader LauncherClient::planMemcpyHtoD(uint64_t dstFakePtr, uint64_t size) {
+MemcpyPlan::Reader LauncherClient::planMemcpyHtoD(uint64_t dstFakePtr, uint64_t size) {
     auto request = m_client.planMemcpyHtoDRequest();
-    request.setDstFakePtr(dstFakePtr);
+    auto handle = request.initDstHandle();
+    handle.getId().setHandle(dstFakePtr);
     request.setSize(size);
     auto response = request.send().wait(m_rpcClient->getWaitScope());
     return response.getPlan();
 }
 
-hook_launcher::MemcpyPlan::Reader LauncherClient::planMemcpyDtoH(uint64_t srcFakePtr, uint64_t size) {
+MemcpyPlan::Reader LauncherClient::planMemcpyDtoH(uint64_t srcFakePtr, uint64_t size) {
     auto request = m_client.planMemcpyDtoHRequest();
-    request.setSrcFakePtr(srcFakePtr);
+    auto handle = request.initSrcHandle();
+    handle.getId().setHandle(srcFakePtr);
     request.setSize(size);
     auto response = request.send().wait(m_rpcClient->getWaitScope());
     return response.getPlan();
 }
 
-common::ErrorCode LauncherClient::launchKernel(const std::string& func, 
-                                              uint32_t gridDim, 
-                                              uint32_t blockDim,
-                                              uint32_t sharedMem,
-                                              const void* params) {
+ErrorCode LauncherClient::launchKernel(const std::string& func, 
+                                      uint32_t gridDimX, 
+                                      uint32_t gridDimY,
+                                      uint32_t gridDimZ,
+                                      uint32_t blockDimX,
+                                      uint32_t blockDimY,
+                                      uint32_t blockDimZ,
+                                      uint32_t sharedMemBytes,
+                                      const void* params) {
     auto request = m_client.launchKernelRequest();
     request.setFunc(func);
-    request.setGridDim(gridDim);
-    request.setBlockDim(blockDim);
-    request.setSharedMem(sharedMem);
+    request.setGridDimX(gridDimX);
+    request.setGridDimY(gridDimY);
+    request.setGridDimZ(gridDimZ);
+    request.setBlockDimX(blockDimX);
+    request.setBlockDimY(blockDimY);
+    request.setBlockDimZ(blockDimZ);
+    request.setSharedMemBytes(sharedMemBytes);
     
     // 正确设置参数数据
     auto paramsBuilder = request.initParams(512); // 分配足够空间
     memcpy(paramsBuilder.begin(), params, 512); // 实际使用时需要知道参数大小
-    
     auto response = request.send().wait(m_rpcClient->getWaitScope());
-    return response.getResult();
+    return static_cast<ErrorCode>(response.getAck().getCode());
 }
 
 // ===== 实现新增高级功能方法 =====
-hook_launcher::NodeInfo::Reader LauncherClient::getMemoryLocation(uint64_t fakePtr) {
+NodeInfo::Reader LauncherClient::getMemoryLocation(uint64_t fakePtr) {
     auto request = m_client.getMemoryLocationRequest();
     request.setFakePtr(fakePtr);
     auto response = request.send().wait(m_rpcClient->getWaitScope());
     return response.getLocation();
 }
 
-common::ErrorCode LauncherClient::advisePrefetch(uint64_t fakePtr) {
+ErrorCode LauncherClient::advisePrefetch(uint64_t fakePtr) {
     auto request = m_client.advisePrefetchRequest();
     request.setFakePtr(fakePtr);
     auto response = request.send().wait(m_rpcClient->getWaitScope());
-    return response.getAck().getError();
+    return static_cast<ErrorCode>(response.getAck().getCode());
 }

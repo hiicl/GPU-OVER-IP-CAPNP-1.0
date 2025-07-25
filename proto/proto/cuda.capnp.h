@@ -1644,7 +1644,7 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasResult() const;
-  inline  ::Result::Reader getResult() const;
+  inline  ::Response::Reader getResult() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -1675,11 +1675,11 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasResult();
-  inline  ::Result::Builder getResult();
-  inline void setResult( ::Result::Reader value);
-  inline  ::Result::Builder initResult();
-  inline void adoptResult(::capnp::Orphan< ::Result>&& value);
-  inline ::capnp::Orphan< ::Result> disownResult();
+  inline  ::Response::Builder getResult();
+  inline void setResult( ::Response::Reader value);
+  inline  ::Response::Builder initResult();
+  inline void adoptResult(::capnp::Orphan< ::Response>&& value);
+  inline ::capnp::Orphan< ::Response> disownResult();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -1699,7 +1699,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
-  inline  ::Result::Pipeline getResult();
+  inline  ::Response::Pipeline getResult();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -3780,7 +3780,7 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasResult() const;
-  inline  ::Result::Reader getResult() const;
+  inline  ::Response::Reader getResult() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -3811,11 +3811,11 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasResult();
-  inline  ::Result::Builder getResult();
-  inline void setResult( ::Result::Reader value);
-  inline  ::Result::Builder initResult();
-  inline void adoptResult(::capnp::Orphan< ::Result>&& value);
-  inline ::capnp::Orphan< ::Result> disownResult();
+  inline  ::Response::Builder getResult();
+  inline void setResult( ::Response::Reader value);
+  inline  ::Response::Builder initResult();
+  inline void adoptResult(::capnp::Orphan< ::Response>&& value);
+  inline ::capnp::Orphan< ::Response> disownResult();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -3835,7 +3835,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
-  inline  ::Result::Pipeline getResult();
+  inline  ::Response::Pipeline getResult();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -4227,34 +4227,34 @@ inline bool CudaService::CudaMemAllocResults::Builder::hasResult() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::Result::Reader CudaService::CudaMemAllocResults::Reader::getResult() const {
-  return ::capnp::_::PointerHelpers< ::Result>::get(_reader.getPointerField(
+inline  ::Response::Reader CudaService::CudaMemAllocResults::Reader::getResult() const {
+  return ::capnp::_::PointerHelpers< ::Response>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::Result::Builder CudaService::CudaMemAllocResults::Builder::getResult() {
-  return ::capnp::_::PointerHelpers< ::Result>::get(_builder.getPointerField(
+inline  ::Response::Builder CudaService::CudaMemAllocResults::Builder::getResult() {
+  return ::capnp::_::PointerHelpers< ::Response>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::Result::Pipeline CudaService::CudaMemAllocResults::Pipeline::getResult() {
-  return  ::Result::Pipeline(_typeless.getPointerField(0));
+inline  ::Response::Pipeline CudaService::CudaMemAllocResults::Pipeline::getResult() {
+  return  ::Response::Pipeline(_typeless.getPointerField(0));
 }
 #endif  // !CAPNP_LITE
-inline void CudaService::CudaMemAllocResults::Builder::setResult( ::Result::Reader value) {
-  ::capnp::_::PointerHelpers< ::Result>::set(_builder.getPointerField(
+inline void CudaService::CudaMemAllocResults::Builder::setResult( ::Response::Reader value) {
+  ::capnp::_::PointerHelpers< ::Response>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::Result::Builder CudaService::CudaMemAllocResults::Builder::initResult() {
-  return ::capnp::_::PointerHelpers< ::Result>::init(_builder.getPointerField(
+inline  ::Response::Builder CudaService::CudaMemAllocResults::Builder::initResult() {
+  return ::capnp::_::PointerHelpers< ::Response>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 inline void CudaService::CudaMemAllocResults::Builder::adoptResult(
-    ::capnp::Orphan< ::Result>&& value) {
-  ::capnp::_::PointerHelpers< ::Result>::adopt(_builder.getPointerField(
+    ::capnp::Orphan< ::Response>&& value) {
+  ::capnp::_::PointerHelpers< ::Response>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::Result> CudaService::CudaMemAllocResults::Builder::disownResult() {
-  return ::capnp::_::PointerHelpers< ::Result>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::Response> CudaService::CudaMemAllocResults::Builder::disownResult() {
+  return ::capnp::_::PointerHelpers< ::Response>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
@@ -5250,34 +5250,34 @@ inline bool CudaService::AllocAndWriteResults::Builder::hasResult() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::Result::Reader CudaService::AllocAndWriteResults::Reader::getResult() const {
-  return ::capnp::_::PointerHelpers< ::Result>::get(_reader.getPointerField(
+inline  ::Response::Reader CudaService::AllocAndWriteResults::Reader::getResult() const {
+  return ::capnp::_::PointerHelpers< ::Response>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::Result::Builder CudaService::AllocAndWriteResults::Builder::getResult() {
-  return ::capnp::_::PointerHelpers< ::Result>::get(_builder.getPointerField(
+inline  ::Response::Builder CudaService::AllocAndWriteResults::Builder::getResult() {
+  return ::capnp::_::PointerHelpers< ::Response>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::Result::Pipeline CudaService::AllocAndWriteResults::Pipeline::getResult() {
-  return  ::Result::Pipeline(_typeless.getPointerField(0));
+inline  ::Response::Pipeline CudaService::AllocAndWriteResults::Pipeline::getResult() {
+  return  ::Response::Pipeline(_typeless.getPointerField(0));
 }
 #endif  // !CAPNP_LITE
-inline void CudaService::AllocAndWriteResults::Builder::setResult( ::Result::Reader value) {
-  ::capnp::_::PointerHelpers< ::Result>::set(_builder.getPointerField(
+inline void CudaService::AllocAndWriteResults::Builder::setResult( ::Response::Reader value) {
+  ::capnp::_::PointerHelpers< ::Response>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::Result::Builder CudaService::AllocAndWriteResults::Builder::initResult() {
-  return ::capnp::_::PointerHelpers< ::Result>::init(_builder.getPointerField(
+inline  ::Response::Builder CudaService::AllocAndWriteResults::Builder::initResult() {
+  return ::capnp::_::PointerHelpers< ::Response>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 inline void CudaService::AllocAndWriteResults::Builder::adoptResult(
-    ::capnp::Orphan< ::Result>&& value) {
-  ::capnp::_::PointerHelpers< ::Result>::adopt(_builder.getPointerField(
+    ::capnp::Orphan< ::Response>&& value) {
+  ::capnp::_::PointerHelpers< ::Response>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::Result> CudaService::AllocAndWriteResults::Builder::disownResult() {
-  return ::capnp::_::PointerHelpers< ::Result>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::Response> CudaService::AllocAndWriteResults::Builder::disownResult() {
+  return ::capnp::_::PointerHelpers< ::Response>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 

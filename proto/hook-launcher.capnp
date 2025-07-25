@@ -8,6 +8,7 @@
 # - 高级协调功能
 using Common = import "common.capnp"; # 基础类型定义
 using Kernel = import "kernel.capnp"; # 内核操作定义
+using Memcopy = import "memcopy.capnp"; # 内存操作定义
 
 struct MemcpyPlan {
   targetServerIp @0 :Text;
@@ -46,7 +47,8 @@ enum TransportType {
 
 interface HookLauncher {
   # ===== 分配决策接口 =====
-  requestAllocationPlan @9 (size :UInt64) -> (plan :AllocationPlan); # 新增：显存分配决策
+  requestAllocationPlan @9 (size :UInt64) -> (plan :AllocationPlan); # 显存分配决策
+  requestFreePlan @10 (fakePtr :UInt64) -> (ack :Common.Ack); # 释放内存
   
   # ===== 原有接口 =====
   planMemcpyHtoD @0 (dstHandle :Common.MemoryHandle, size :UInt64) -> (plan :MemcpyPlan); # 规划主机到设备的内存传输
@@ -68,52 +70,14 @@ interface HookLauncher {
 
   # ===== RDMA传输规划接口 =====
   requestRdmaPlan @8 (srcHandle :Common.MemoryHandle, dstHandle :Common.MemoryHandle, size :UInt64) 
-    -> (plan :RdmaPlan);
-}
-
-# ===== 统一服务接口 =====
-interface UnifiedServices {
-  # 内存操作接口
-  memoryOperation @0 (op :MemoryOp) -> (result :Common.Response);
+    -> (plan :Memcopy.RdmaPlan);
   
-  # 系统状态接口
-  getSystemStatus @1 () -> (status :SystemStatus);
-  
-  # 数据传输接口
-  transferData @2 (plan :TransferPlan) -> (result :Common.Response);
-  
-  # 访问记录接口
-  recordAccess @3 (access :AccessRecord) -> (result :Common.Response);
-  
-  # 建议服务
-  handleAdvise @4 (advice :AdviceRequest) -> (result :Common.Response);
-}
-
-# 标记旧方法为弃用（分阶段迁移）
-deprecated requestAllocationPlanV2 @16 (size: UInt64) -> (plan: AllocationPlan);
-
-enum TransferType {
-  hostToDevice @0;
-  deviceToHost @1;
-  deviceToDevice @2;
-}
-
-enum AccessType {
-  read @0;
-  write @1;
-}
-
-struct SystemStatus {
-  nodes @0 :List(NodeStatus);
-  heatmap @1 :Data;  # 二进制格式的热度图数据
-}
-
-struct RdmaPlan {
-  success @0 :Bool;
-  srcAddr @1 :UInt64;
-  srcKey @2 :UInt32;
-  dstAddr @3 :UInt64;
-  dstKey @4 :UInt32;
+  # ===== 内核启动接口 =====
+  launchKernel @11 (func :Text,
+                   gridDimX :UInt32, gridDimY :UInt32, gridDimZ :UInt32,
+                   blockDimX :UInt32, blockDimY :UInt32, blockDimZ :UInt32,
+                   sharedMemBytes :UInt32,
+                   params :Data) -> (ack :Common.Ack); # 启动内核
 }
 
 # ===== 新增结构定义 =====

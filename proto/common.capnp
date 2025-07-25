@@ -1,8 +1,20 @@
 @0xdefdefdefdefdef0;
 
-using ID = union {
-  uuid @0 :Text;   # UUID格式
-  handle @1 :UInt64; # 数值句柄
+# 基础类型定义
+using UUID = Text;
+using Handle = UInt64;
+
+struct ID {
+  union {
+    uuid @0 :Text;   # UUID格式
+    handle @1 :UInt64; # 数值句柄
+  }
+}
+
+struct Ack {
+  ok @0 :Bool;
+  msg @1 :Text;
+  code @2 :ErrorCode;
 }
 
 struct GpuInfo {

@@ -40,6 +40,7 @@
 #include <nlohmann/json.hpp>
 #include <capnp/ez-rpc.h>
 #include <kj/async.h>
+#include <kj/async-io.h>
 
 // CUDA API Header
 #include <cuda.h>

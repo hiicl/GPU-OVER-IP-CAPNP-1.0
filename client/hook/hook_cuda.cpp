@@ -3,13 +3,11 @@
 #include "pch.h" // 预编译头必须放在最前面
 #include "hook_cuda.h" // 当前模块专用头文件
 
-using namespace hook_launcher;
-
 // 全局资源声明
 static std::mutex g_api_mutex; // 添加API互斥锁
 static std::map<CUfunction, std::string> g_function_name_map;
 static std::thread g_status_thread;
-static LauncherClient g_launcher_client; // 使用LauncherClient替代本地服务
+static LauncherClient g_launcher_client("127.0.0.1:12345"); // 使用LauncherClient替代本地服务
 
 // 原始函数指针声明
 #define LOAD_ORIG(func) pOriginal_##func = reinterpret_cast<func##_t>(GetProcAddress(cudaModule, #func))
@@ -60,15 +58,10 @@ CUresult CUDAAPI Hooked_cuMemAlloc(CUdeviceptr* dev_ptr, size_t byte_size) {
     std::lock_guard<std::mutex> lock(g_api_mutex);
     
     // 通过RPC调用远程分配内存
-    auto result = g_launcher_client.AllocateMemory(byte_size);
-    if (result.error != CUDA_SUCCESS) {
-        std::cerr << "[Hook] Remote allocation failed: " << result.error << std::endl;
-        return result.error;
-    }
-    
-    *dev_ptr = result.device_ptr;
-    std::cout << "[Hook] Allocated " << byte_size << " bytes remotely, ptr: 0x" 
-              << std::hex << *dev_ptr << std::dec << std::endl;
+    auto result = g_launcher_client.requestAllocationPlan(byte_size);
+    // 注意: AllocationPlan不包含设备指针，需要后续实现
+    // 临时解决方案 - 返回原始实现
+    return pOriginal_cuMemAlloc(dev_ptr, byte_size);
     
     return CUDA_SUCCESS;
 }
@@ -78,14 +71,13 @@ CUresult CUDAAPI Hooked_cuMemFree(CUdeviceptr dptr) {
     std::lock_guard<std::mutex> lock(g_api_mutex);
     
     // 通过RPC调用远程释放内存
-    auto result = g_launcher_client.FreeMemory(dptr);
-    if (result != CUDA_SUCCESS) {
-        std::cerr << "[Hook] Remote free failed: " << result << std::endl;
-        return result;
+    auto result = g_launcher_client.requestFreePlan(dptr);
+    if (static_cast<int>(result) != CUDA_SUCCESS) {
+        std::cerr << "[Hook] Remote free failed: " << static_cast<int>(result) << std::endl;
     }
     
-    std::cout << "[Hook] Freed memory for ptr: 0x" 
-              << std::hex << dptr << std::dec << std::endl;
+    // 同时调用原始释放
+    return pOriginal_cuMemFree(dptr);
     
     return CUDA_SUCCESS;
 }
@@ -140,7 +132,7 @@ CUresult CUDAAPI Hooked_cuLaunchKernel(
     
     try {
         // 通过RPC调用远程启动内核
-        auto result = g_launcher_client.LaunchKernel(
+        auto result = g_launcher_client.launchKernel(
             kernelName,
             gridDimX, gridDimY, gridDimZ,
             blockDimX, blockDimY, blockDimZ,
@@ -148,7 +140,7 @@ CUresult CUDAAPI Hooked_cuLaunchKernel(
             kernelParams
         );
         
-        return result;
+        return static_cast<CUresult>(result);
     } catch (const kj::Exception& e) {
         std::cerr << "[Hook] Exception in LaunchKernel: " << e.getDescription().cStr() << std::endl;
         return CUDA_ERROR_LAUNCH_FAILED;
@@ -159,16 +151,15 @@ CUresult CUDAAPI Hooked_cuLaunchKernel(
 void InitializeHook() {
     InitOriginalFunctions();
     
-    // 初始化LauncherClient
-    g_launcher_client.Connect("127.0.0.1:12345");
+    // 连接LauncherClient
+    g_launcher_client.connect();
     
     std::cout << "[Hook] Initialized with LauncherClient" << std::endl;
 }
 
 // CleanupHook实现
 void CleanupHook() {
-    // 断开LauncherClient连接
-    g_launcher_client.Disconnect();
+    // 无需显式断开连接
     
     if (cudaModule) {
         FreeLibrary(cudaModule);
